@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
-  <title>오답노트 최종판</title>
+  <title>오답노트</title>
   <style>
     :root{
       --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --panel3:#0f172a; --line:#334155;
@@ -94,7 +94,7 @@
     <div class="top">
       <div>
         <div class="title">오답노트</div>
-        <div class="sub">목록 먼저 보고, + 누르면 전체화면 작성. 필기는 자동 백업되고 손가락은 스크롤/확대, 펜만 필기됨.</div>
+        <div class="sub">+를 눌러 오답노트를 작성하세요.</div>
       </div>
       <div class="actions">
         <button class="btn soft" id="sampleBtn">예시 추가</button>
@@ -227,8 +227,8 @@
             </div>
             <div class="canvas-stage"><canvas id="drawCanvas"></canvas></div>
             <div class="canvas-meta">
-              필기 중 자동 백업됨. 손가락은 스크롤/확대용으로 두고, 애플펜슬 입력을 pointer pen과 touch stylus 둘 다 받게 구현함.
-              <div class="warning">브라우저 기반이라 시스템 앱 수준 팜 리젝션과 100% 동일하진 않지만, 이전보다 훨씬 안정적으로 동작하도록 손 입력을 무시하고 자동 저장을 강화했다.</div>
+              필기 중 자동 백업
+              <div class="warning">아이팬슬만 인식 가능</div>
             </div>
           </div>
         </div>
@@ -713,7 +713,7 @@ document.getElementById("clearCanvasBtn").addEventListener("click", ()=>clearCan
 
 function getFormData(){
   const problem = document.getElementById("problemInput").value.trim();
-  if(!problem){ alert("문제 / 제목을 입력해."); document.getElementById("problemInput").focus(); return null; }
+  if(!problem){ alert("문제 / 제목을 입력하세요."); document.getElementById("problemInput").focus(); return null; }
   return {
     id: editingId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random())),
     subject: document.getElementById("subjectInput").value.trim(),
@@ -771,7 +771,7 @@ async function saveCurrent(){
     render();
     closeEditor();
   }catch(err){
-    alert("저장 중 문제가 생겼어. 이미지가 너무 크면 자동으로 줄이도록 바꿨는데, 그래도 안 되면 이미지 수를 조금 줄여봐.");
+    alert("저장 중 문제가 생겼습니다. 이미지 수를 줄여보세요");
     console.error(err);
   }finally{
     if(saveBtn) saveBtn.disabled = false;
@@ -779,7 +779,7 @@ async function saveCurrent(){
 }
 async function markReviewDone(){
   safeDraftSave();
-  if(!editingId){ alert("먼저 목록에서 수정할 오답을 선택해."); return; }
+  if(!editingId){ alert("먼저 목록에서 수정할 오답을 선택하세요."); return; }
   const idx = notes.findIndex(n => n.id === editingId);
   if(idx === -1) return;
   notes[idx].reviewStatus = 2;
@@ -823,7 +823,7 @@ function cycleReview(id){
 function removeNote(id){
   const note = notes.find(n => n.id === id);
   if(!note) return;
-  if(!confirm(`'${note.problem.slice(0,20)}' 삭제할까?`)) return;
+  if(!confirm(`'${note.problem.slice(0,20)}' 삭제할까요?`)) return;
   notes = notes.filter(n => n.id !== id);
   if(editingId === id) resetForm();
   saveNotes();
@@ -858,7 +858,7 @@ function render(){
   const list = document.getElementById("list");
   const data = filteredNotes();
   document.getElementById("listMeta").textContent = `${data.length}개 표시 중`;
-  if(!data.length){ list.innerHTML = `<div class="empty">아직 정리된 오답이 없어. 아래 + 버튼을 눌러 첫 오답을 작성해.</div>`; return; }
+  if(!data.length){ list.innerHTML = `<div class="empty">아직 정리된 오답이 없습니다. 아래 + 버튼을 눌러 첫 오답을 작성하세요.</div>`; return; }
   list.innerHTML = data.map(note => `
     <div class="card">
       <div class="card-top">
@@ -900,12 +900,12 @@ function importData(file){
       await saveNotes();
       resetForm();
       render();
-    }catch{ alert("올바른 JSON 파일이 아니야."); }
+    }catch{ alert("올바른 JSON 파일이 아닙니다."); }
   };
   reader.readAsText(file, "utf-8");
 }
 async function addSample(){
-  if(notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까?")) return;
+  if(notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까요?")) return;
   notes.unshift({id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), subject:"수학", unit:"적분", type:"계산 실수", date:today, source:"기출 21번", problem:"부분적분을 두 번 써야 하는 문제였는데 첫 단계에서 부호를 잘못 처리함.", problemImages:[], reason:"계산 실수", reasonDetail:"미분되는 항과 적분되는 항을 바꿔 적었고 마지막 부호 확인을 안 함.", correct:"u=x, dv=e^x dx로 놓고 부분적분 후 다시 한 번 적용. 마지막에 상수항 정리까지 확인.", solutionImages:[], drawing:null, memory:"부분적분 문제는 식 변형 끝난 뒤 부호를 한 번 더 체크.", reviewStatus:1, createdAt:Date.now()});
   await saveNotes();
   render();
