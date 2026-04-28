@@ -1,419 +1,459 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>오답노트</title>
-  <style>
-    :root{
-      --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --panel3:#0f172a; --line:#334155;
-      --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; --accentSoft:#1e3a8a; --danger:#ef4444;
-      --shadow:0 10px 30px rgba(0,0,0,.28); --safe-top:max(16px, env(safe-area-inset-top)); --safe-bottom:max(16px, env(safe-area-inset-bottom));
-    }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif}
-    body{min-height:100vh}
-    button,input,select,textarea{font:inherit}
-    .app{max-width:1500px;margin:0 auto;padding:var(--safe-top) 16px calc(108px + var(--safe-bottom))}
-    .top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
-    .title{font-size:34px;font-weight:800;letter-spacing:-.03em}
-    .sub{color:var(--muted);font-size:15px;margin-top:6px;line-height:1.5}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-weight:700;box-shadow:var(--shadow);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;pointer-events:auto;position:relative;z-index:30}
-    .btn.primary{background:var(--accent);border-color:transparent;color:#fff}
-    .btn.soft{background:var(--accentSoft);color:#bfdbfe;border-color:transparent}
-    .btn.danger{background:#3b1111;color:#fecaca;border-color:transparent}
-    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-    .metric{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
-    .metric .n{font-size:30px;font-weight:800}
-    .metric .k{font-size:13px;color:var(--muted);margin-top:4px}
-    .board{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;min-height:760px}
-    .section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-    .section-title h2{margin:0;font-size:22px}
-    .meta{font-size:13px;color:var(--muted)}
-    .input,.textarea,.select{width:100%;border:1px solid var(--line);background:var(--panel2);border-radius:16px;padding:16px;color:var(--text);outline:none;font-size:16px}
-    .input::placeholder,.textarea::placeholder{color:var(--muted)}
-    .textarea{min-height:140px;resize:vertical;line-height:1.65}
-    .textarea.large{min-height:220px}
-    .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:12px 14px;font-size:14px;font-weight:700;color:#cbd5e1;cursor:pointer}
-    .chip.active{background:var(--accentSoft);border-color:transparent;color:#bfdbfe}
-    .searchbar{display:grid;grid-template-columns:1fr 220px 160px;gap:10px;margin-bottom:14px}
-    .list{display:flex;flex-direction:column;gap:14px}
-    .empty{border:1px dashed var(--line);background:var(--panel2);border-radius:20px;padding:32px;text-align:center;color:var(--muted)}
-    .card{border:1px solid var(--line);background:var(--panel2);border-radius:22px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.18)}
-    .card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
-    .badges{display:flex;gap:8px;flex-wrap:wrap}
-    .badge{display:inline-flex;align-items:center;height:32px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:800}
-    .b-subject{background:#082f49;color:#bae6fd}.b-unit{background:#3b0764;color:#e9d5ff}.b-type{background:#052e16;color:#bbf7d0}
-    .b-review0{background:#450a0a;color:#fecaca}.b-review1{background:#451a03;color:#fde68a}.b-review2{background:#052e16;color:#bbf7d0}
-    .problem{font-size:24px;font-weight:800;line-height:1.45;margin:14px 0}
-    .block{margin-top:12px;padding:16px;background:var(--panel3);border:1px solid var(--line);border-radius:16px}
-    .block h3{margin:0 0 8px;font-size:15px}
-    .block p{margin:0;white-space:pre-wrap;line-height:1.7;font-size:15px}
-    .card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-    .card-actions .btn{min-height:42px;padding:0 13px;border-radius:14px;box-shadow:none}
-    .preview-grid,.image-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:10px}
-    .preview-item,.image-item{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0f172a}
-    .preview-item img,.image-item img{width:100%;height:100%;min-height:140px;object-fit:cover;display:block}
-    .remove-image-btn{position:absolute;top:6px;right:6px;min-height:auto;padding:7px 9px;border-radius:10px;font-size:12px;background:rgba(239,68,68,.92);color:white;border:none;cursor:pointer}
-    .hint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
-    .canvas-wrap{margin-top:10px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;position:relative;z-index:0}
-    .canvas-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:#0f172a;border-bottom:1px solid var(--line);align-items:center;user-select:none;-webkit-user-select:none}
-    .tool-btn{min-height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;pointer-events:auto}
-    .tool-btn.active{background:var(--accent);border-color:transparent;color:white}
-    .stroke-range{width:140px;accent-color:#3b82f6}
-    .canvas-stage{position:relative;background:#fff;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden;max-height:none}
-    #drawCanvas{display:block;width:100%;height:620px;background:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
-    .canvas-meta{padding:12px 14px;background:#0f172a;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.5}
-    .drawing-preview{margin-top:12px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
-    .drawing-preview img{display:block;width:100%;max-height:420px;object-fit:contain;background:#fff}
-    .color-buttons{display:flex;gap:6px;flex-wrap:wrap}
-    .color-btn{min-height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:white;cursor:pointer;font-size:12px;font-weight:700;user-select:none;-webkit-user-select:none;touch-action:manipulation;pointer-events:auto}
-    .color-btn.active{outline:2px solid #fff4}
-    .color-btn.black{background:#111111}.color-btn.blue{background:#2563eb}.color-btn.red{background:#dc2626}
-    .footerbar{position:fixed;left:0;right:0;bottom:0;padding:10px 16px var(--safe-bottom);background:linear-gradient(to top, rgba(11,18,32,.98), rgba(11,18,32,.92), rgba(11,18,32,0));backdrop-filter:blur(10px)}
-    .footerinner{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:1fr 78px;gap:10px}
-    .quicksearch{min-height:60px;border-radius:18px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:0 18px;outline:none;box-shadow:var(--shadow);font-size:16px}
-    .fab{border:0;border-radius:18px;background:var(--accent);color:#fff;font-size:30px;font-weight:900;box-shadow:0 10px 30px rgba(59,130,246,.3);cursor:pointer}
-    .editor-overlay{position:fixed;inset:0;z-index:100;display:none;background:var(--bg)}
-    .editor-overlay.open{display:block}
-    .editor-shell{height:100%;overflow:auto;padding:var(--safe-top) 18px calc(24px + var(--safe-bottom));max-width:1220px;margin:0 auto}
-    .editor-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;position:sticky;top:0;background:linear-gradient(to bottom, rgba(11,18,32,.98), rgba(11,18,32,.9), rgba(11,18,32,0));padding-bottom:10px;z-index:2}
-    .editor-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px;position:relative;z-index:1}
-    .field{margin-bottom:16px}
-    .field label{display:block;font-size:14px;font-weight:700;margin-bottom:8px;color:#cbd5e1}
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .warning{font-size:13px;color:#fca5a5}
-    @media (max-width: 1100px){ .summary{grid-template-columns:repeat(2,1fr)} .searchbar{grid-template-columns:1fr} .editor-shell{max-width:100%;padding-left:12px;padding-right:12px} #drawCanvas{height:520px} }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1220" />
+<link rel="manifest" href="manifest.json" />
+<title>오답노트 - 필기 & 복습</title>
+<meta name="description" content="틀린 문제를 정리하고 필기하며 복습까지 관리하는 오답노트 앱" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="오답노트" />
+<style>
+:root{
+  --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --panel3:#0f172a; --line:#334155;
+  --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; --accentSoft:#1e3a8a; --danger:#ef4444;
+  --shadow:0 10px 30px rgba(0,0,0,.28);
+  --safe-top:max(16px, env(safe-area-inset-top));
+  --safe-bottom:max(16px, env(safe-area-inset-bottom));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif}
+body{min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app{max-width:1500px;margin:0 auto;padding:var(--safe-top) 16px calc(108px + var(--safe-bottom))}
+.top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.title{font-size:34px;font-weight:800;letter-spacing:-.03em}
+.sub{color:var(--muted);font-size:15px;margin-top:6px;line-height:1.5}
+.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:14px 16px;border:1px solid #1d4ed8;background:linear-gradient(135deg,#0f172a,#172554);border-radius:18px;box-shadow:var(--shadow)}
+.install-banner.show{display:flex}
+.install-text{font-size:14px;line-height:1.5;color:#dbeafe}
+.install-actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-weight:700;box-shadow:var(--shadow);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
+.btn.soft{background:var(--accentSoft);color:#bfdbfe;border-color:transparent}
+.btn.danger{background:#3b1111;color:#fecaca;border-color:transparent}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.metric .n{font-size:30px;font-weight:800}
+.metric .k{font-size:13px;color:var(--muted);margin-top:4px}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;min-height:760px}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.section-title h2{margin:0;font-size:22px}
+.meta{font-size:13px;color:var(--muted)}
+.input,.textarea,.select{width:100%;border:1px solid var(--line);background:var(--panel2);border-radius:16px;padding:16px;color:var(--text);outline:none;font-size:16px}
+.input::placeholder,.textarea::placeholder{color:var(--muted)}
+.textarea{min-height:140px;resize:vertical;line-height:1.65}
+.textarea.large{min-height:220px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:12px 14px;font-size:14px;font-weight:700;color:#cbd5e1;cursor:pointer}
+.chip.active{background:var(--accentSoft);border-color:transparent;color:#bfdbfe}
+.searchbar{display:grid;grid-template-columns:1fr 220px 160px;gap:10px;margin-bottom:14px}
+.list{display:flex;flex-direction:column;gap:14px}
+.empty{border:1px dashed var(--line);background:var(--panel2);border-radius:20px;padding:32px;text-align:center;color:var(--muted)}
+.card{border:1px solid var(--line);background:var(--panel2);border-radius:22px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;height:32px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:800}
+.b-subject{background:#082f49;color:#bae6fd}.b-unit{background:#3b0764;color:#e9d5ff}.b-type{background:#052e16;color:#bbf7d0}
+.b-review0{background:#450a0a;color:#fecaca}.b-review1{background:#451a03;color:#fde68a}.b-review2{background:#052e16;color:#bbf7d0}
+.problem{font-size:24px;font-weight:800;line-height:1.45;margin:14px 0}
+.block{margin-top:12px;padding:16px;background:var(--panel3);border:1px solid var(--line);border-radius:16px}
+.block h3{margin:0 0 8px;font-size:15px}
+.block p{margin:0;white-space:pre-wrap;line-height:1.7;font-size:15px}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.card-actions .btn{min-height:42px;padding:0 13px;border-radius:14px;box-shadow:none}
+.preview-grid,.image-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:10px}
+.preview-item,.image-item{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0f172a}
+.preview-item img,.image-item img{width:100%;height:100%;min-height:140px;object-fit:cover;display:block}
+.remove-image-btn{position:absolute;top:6px;right:6px;min-height:auto;padding:7px 9px;border-radius:10px;font-size:12px;background:rgba(239,68,68,.92);color:white;border:none;cursor:pointer}
+.hint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+.empty strong{display:block;color:var(--text);font-size:18px;margin-bottom:8px}
+.empty-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.canvas-help{font-size:13px;color:var(--muted);padding:10px 12px;background:#0f172a;border-bottom:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-bottom));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#111827;color:#e5e7eb;border:1px solid var(--line);padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);transition:.22s ease;z-index:300;max-width:min(92vw,480px);font-size:14px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.canvas-wrap{margin-top:10px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;position:relative;z-index:0}
+.canvas-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:#0f172a;border-bottom:1px solid var(--line);align-items:center;user-select:none;-webkit-user-select:none}
+.tool-btn{min-height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer;touch-action:manipulation}
+.tool-btn.active{background:var(--accent);border-color:transparent;color:white}
+.stroke-range{width:120px;accent-color:#3b82f6}
+.canvas-stage{position:relative;background:#fff;user-select:none;-webkit-user-select:none;overflow:auto;max-height:min(70vh,720px);touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#drawCanvas{display:block;width:100%;height:900px;background:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+.color-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.color-btn{min-height:40px;padding:0 13px;border-radius:12px;border:2px solid transparent;color:white;cursor:pointer;font-size:12px;font-weight:700;touch-action:manipulation}
+.color-btn.active{border-color:#fff}
+.color-btn.black{background:#111111}.color-btn.blue{background:#2563eb}.color-btn.red{background:#dc2626}
+.footerbar{position:fixed;left:0;right:0;bottom:0;padding:10px 16px var(--safe-bottom);background:linear-gradient(to top, rgba(11,18,32,.98), rgba(11,18,32,.92), rgba(11,18,32,0));backdrop-filter:blur(10px)}
+.footerinner{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:1fr 78px;gap:10px}
+.quicksearch{min-height:60px;border-radius:18px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:0 18px;outline:none;box-shadow:var(--shadow);font-size:16px}
+.fab{border:0;border-radius:18px;background:var(--accent);color:#fff;font-size:30px;font-weight:900;box-shadow:0 10px 30px rgba(59,130,246,.3);cursor:pointer;touch-action:manipulation}
+.editor-overlay{position:fixed;inset:0;z-index:100;display:none;background:var(--bg);overflow:auto}
+.editor-overlay.open{display:block}
+.editor-shell{padding:var(--safe-top) 18px calc(24px + var(--safe-bottom));max-width:1220px;margin:0 auto}
+.editor-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;position:sticky;top:0;background:linear-gradient(to bottom, rgba(11,18,32,.98) 80%, rgba(11,18,32,0));padding-bottom:10px;z-index:2}
+.editor-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px;position:relative;z-index:1}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:14px;font-weight:700;margin-bottom:8px;color:#cbd5e1}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{position:sticky;bottom:0;z-index:20;background:linear-gradient(to top, rgba(17,24,39,.98) 80%, rgba(17,24,39,0));padding-top:10px}
+@media (max-width:1100px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .install-banner{align-items:flex-start;flex-direction:column}
+  .searchbar{grid-template-columns:1fr}
+  .editor-shell{padding-left:12px;padding-right:12px}
+  #drawCanvas{height:400px}
+  .row2{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="top">
-      <div>
-        <div class="title">오답노트</div>
-        <div class="sub">+를 눌러 오답노트를 작성하세요.</div>
-      </div>
-      <div class="actions">
-        <button class="btn soft" id="sampleBtn">예시 추가</button>
-        <button class="btn" id="exportBtn">내보내기</button>
-        <button class="btn" id="importBtn">불러오기</button>
-        <input type="file" id="importFile" accept=".json" hidden />
-      </div>
+
+<div class="app">
+  <div class="top">
+    <div>
+      <div class="title">오답노트</div>
+      <div class="sub">틀린 문제를 적고, 필기하고, 다시 복습할 수 있게 정리하세요.</div>
     </div>
-
-    <div class="summary">
-      <div class="metric"><div class="n" id="totalCount">0</div><div class="k">전체 오답</div></div>
-      <div class="metric"><div class="n" id="todayCount">0</div><div class="k">오늘 추가</div></div>
-      <div class="metric"><div class="n" id="needReviewCount">0</div><div class="k">복습 필요</div></div>
-      <div class="metric"><div class="n" id="doneCount">0</div><div class="k">복습 완료</div></div>
+    <div class="actions">
+      <button class="btn soft" id="sampleBtn">예시 추가</button>
+      <button class="btn" id="exportBtn">내보내기</button>
+      <button class="btn" id="importBtn">불러오기</button>
+      <input type="file" id="importFile" accept=".json" hidden />
     </div>
-
-    <main class="board">
-      <div class="section-title">
-        <h2>정리된 오답</h2>
-        <div class="meta" id="listMeta">0개 표시 중</div>
-      </div>
-
-      <div class="searchbar">
-        <input class="input" id="searchInput" placeholder="문제, 과목, 단원, 이유 검색" />
-        <input class="input" id="subjectFilter" placeholder="과목 필터 (직접 입력)" />
-        <select class="select" id="reviewFilter">
-          <option value="전체">전체 상태</option>
-          <option value="복습 필요">복습 필요</option>
-          <option value="복습 중">복습 중</option>
-          <option value="복습 완료">복습 완료</option>
-        </select>
-      </div>
-
-      <div class="list" id="list"></div>
-    </main>
   </div>
 
-  <div class="editor-overlay" id="editorOverlay">
-    <div class="editor-shell">
-      <div class="editor-header">
-        <h2 id="formTitle" style="margin:0;font-size:26px;">오답 작성</h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn" id="closeEditorBtn">닫기</button>
-          <button class="btn" id="resetFormBtn">초기화</button>
+  <div class="install-banner" id="installBanner">
+    <div class="install-text"><strong>앱처럼 설치해서 더 편하게 쓰기</strong><br>홈 화면에 추가하면 전체화면으로 빠르게 열 수 있어요.</div>
+    <div class="install-actions">
+      <button class="btn primary" id="installBtn" type="button">설치</button>
+      <button class="btn" id="dismissInstallBtn" type="button">닫기</button>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="metric"><div class="n" id="totalCount">0</div><div class="k">전체 오답</div></div>
+    <div class="metric"><div class="n" id="todayCount">0</div><div class="k">오늘 추가</div></div>
+    <div class="metric"><div class="n" id="needReviewCount">0</div><div class="k">복습 필요</div></div>
+    <div class="metric"><div class="n" id="doneCount">0</div><div class="k">복습 완료</div></div>
+  </div>
+
+  <main class="board">
+    <div class="section-title">
+      <h2>정리된 오답</h2>
+      <div class="meta" id="listMeta">0개 표시 중</div>
+    </div>
+    <div class="searchbar">
+      <input class="input" id="searchInput" placeholder="문제, 과목, 단원, 이유 검색" />
+      <input class="input" id="subjectFilter" placeholder="과목 필터" />
+      <select class="select" id="reviewFilter">
+        <option value="전체">전체 상태</option>
+        <option value="복습 필요">복습 필요</option>
+        <option value="복습 중">복습 중</option>
+        <option value="복습 완료">복습 완료</option>
+      </select>
+    </div>
+    <div class="list" id="list"></div>
+  </main>
+</div>
+
+<!-- 에디터 오버레이 -->
+<div class="editor-overlay" id="editorOverlay">
+  <div class="editor-shell">
+    <div class="editor-header">
+      <h2 id="formTitle" style="margin:0;font-size:26px;">오답 작성</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" id="resetFormBtn">초기화</button>
+        <button class="btn" id="closeEditorBtn">닫기</button>
+      </div>
+    </div>
+    <div class="editor-card">
+      <div class="row2">
+        <div class="field">
+          <label>과목</label>
+          <input class="input" id="subjectInput" placeholder="예: 수학, 물리학1, 영어" />
+        </div>
+        <div class="field">
+          <label>단원</label>
+          <input class="input" id="unitInput" placeholder="예: 적분, 역학, 전자기" />
         </div>
       </div>
-
-      <div class="editor-card">
-        <div class="row2">
-          <div class="field">
-            <label for="subjectInput">과목</label>
-            <input class="input" id="subjectInput" placeholder="예: 수학, 물리학1, 영어" />
-          </div>
-          <div class="field">
-            <label for="unitInput">단원</label>
-            <input class="input" id="unitInput" placeholder="예: 적분, 역학, 전자기" />
-          </div>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <label for="typeInput">유형</label>
-            <input class="input" id="typeInput" placeholder="예: 계산 실수, 개념 미흡" />
-          </div>
-          <div class="field">
-            <label for="dateInput">푼 날짜</label>
-            <input class="input" id="dateInput" type="date" />
-          </div>
-        </div>
-
+      <div class="row2">
         <div class="field">
-          <label for="sourceInput">출처</label>
-          <input class="input" id="sourceInput" placeholder="예: 3월 모의고사 12번, 수특 45쪽" />
+          <label>유형</label>
+          <input class="input" id="typeInput" placeholder="예: 계산 실수, 개념 미흡" />
         </div>
-
         <div class="field">
-          <label for="problemInput">문제 / 제목</label>
-          <textarea class="textarea large" id="problemInput" placeholder="어떤 문제였는지, 무엇을 물었는지 자세히 적기"></textarea>
+          <label>푼 날짜</label>
+          <input class="input" id="dateInput" type="date" />
         </div>
-
-        <div class="field">
-          <label for="problemImageInput">문제 이미지</label>
-          <input class="input" id="problemImageInput" type="file" accept="image/*" multiple />
-          <div class="hint">문제 캡처, 지문 사진 등을 여기에 첨부</div>
-          <div class="preview-grid" id="problemImagePreview"></div>
+      </div>
+      <div class="field">
+        <label>출처</label>
+        <input class="input" id="sourceInput" placeholder="예: 3월 모의고사 12번, 수특 45쪽" />
+      </div>
+      <div class="field">
+        <label>문제 / 제목</label>
+        <textarea class="textarea large" id="problemInput" placeholder="어떤 문제였는지, 무엇을 물었는지 자세히 적기"></textarea>
+      </div>
+      <div class="field">
+        <label>문제 이미지</label>
+        <input class="input" id="problemImageInput" type="file" accept="image/*" multiple />
+        <div class="hint">문제 캡처, 지문 사진 등을 첨부하세요.</div>
+        <div class="preview-grid" id="problemImagePreview"></div>
+      </div>
+      <div class="field">
+        <label>틀린 이유</label>
+        <div class="chips" id="reasonChips">
+          <button type="button" class="chip active" data-value="개념 부족">개념 부족</button>
+          <button type="button" class="chip" data-value="계산 실수">계산 실수</button>
+          <button type="button" class="chip" data-value="조건 해석 실수">조건 해석 실수</button>
+          <button type="button" class="chip" data-value="시간 부족">시간 부족</button>
+          <button type="button" class="chip" data-value="암기 부족">암기 부족</button>
         </div>
-
-        <div class="field">
-          <label>틀린 이유</label>
-          <div class="chips" id="reasonChips">
-            <button type="button" class="chip active" data-value="개념 부족">개념 부족</button>
-            <button type="button" class="chip" data-value="계산 실수">계산 실수</button>
-            <button type="button" class="chip" data-value="조건 해석 실수">조건 해석 실수</button>
-            <button type="button" class="chip" data-value="시간 부족">시간 부족</button>
-            <button type="button" class="chip" data-value="암기 부족">암기 부족</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="reasonDetailInput">세부 원인</label>
-          <textarea class="textarea" id="reasonDetailInput" placeholder="왜 틀렸는지, 어떤 생각 때문에 막혔는지 자세히 적기"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="correctInput">정답 / 다시 푼 핵심</label>
-          <textarea class="textarea large" id="correctInput" placeholder="다시 풀면서 핵심 논리와 정답을 정리"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="solutionImageInput">풀이 이미지</label>
-          <input class="input" id="solutionImageInput" type="file" accept="image/*" multiple />
-          <div class="hint">직접 푼 풀이 사진, 필기 캡처 등을 여기에 첨부</div>
-          <div class="preview-grid" id="solutionImagePreview"></div>
-        </div>
-
-        <div class="field">
-          <label>풀이 필기</label>
-          <div class="canvas-wrap">
-            <div class="canvas-toolbar">
-              <button type="button" class="tool-btn active" id="penToolBtn">펜</button>
-              <button type="button" class="tool-btn" id="eraserToolBtn">지우개</button>
-              <div class="color-buttons">
-                <button type="button" class="color-btn black active" data-color="#111111">검정</button>
-                <button type="button" class="color-btn blue" data-color="#2563eb">파랑</button>
-                <button type="button" class="color-btn red" data-color="#dc2626">빨강</button>
-              </div>
-              <input type="range" id="penSize" class="stroke-range" min="2" max="18" value="5">
-              <button type="button" class="tool-btn" id="undoBtn">되돌리기</button>
-              <button type="button" class="tool-btn" id="clearCanvasBtn">전체 지우기</button>
+      </div>
+      <div class="field">
+        <label>세부 원인</label>
+        <textarea class="textarea" id="reasonDetailInput" placeholder="왜 틀렸는지, 어떤 생각 때문에 막혔는지 자세히 적기"></textarea>
+      </div>
+      <div class="field">
+        <label>정답 / 다시 푼 핵심</label>
+        <textarea class="textarea large" id="correctInput" placeholder="다시 풀면서 핵심 논리와 정답을 정리"></textarea>
+      </div>
+      <div class="field">
+        <label>풀이 이미지</label>
+        <input class="input" id="solutionImageInput" type="file" accept="image/*" multiple />
+        <div class="hint">직접 푼 풀이 사진, 필기 캡처 등을 첨부하세요.</div>
+        <div class="preview-grid" id="solutionImagePreview"></div>
+      </div>
+      <div class="field">
+        <label>풀이 필기</label>
+        <div class="canvas-wrap">
+          <div class="canvas-toolbar">
+            <button type="button" class="tool-btn active" id="penToolBtn">펜</button>
+            <button type="button" class="tool-btn" id="eraserToolBtn">지우개</button>
+            <button type="button" class="tool-btn" id="moveToolBtn">스크롤</button>
+            <div class="color-buttons">
+              <button type="button" class="color-btn black active" data-color="#111111">검정</button>
+              <button type="button" class="color-btn blue" data-color="#2563eb">파랑</button>
+              <button type="button" class="color-btn red" data-color="#dc2626">빨강</button>
             </div>
-            <div class="canvas-stage"><canvas id="drawCanvas"></canvas></div>
-            <div class="canvas-meta">
-              필기 중 자동 백업
-              <div class="warning">아이팬슬만 인식 가능</div>
-            </div>
+            <input type="range" id="penSize" class="stroke-range" min="2" max="18" value="5">
+            <button type="button" class="tool-btn" id="undoBtn">되돌리기</button>
+            <button type="button" class="tool-btn" id="clearCanvasBtn">전체 지우기</button>
           </div>
+          <div class="canvas-help">펜으로 쓸 때는 펜/지우개, 화면을 움직일 때는 스크롤 버튼을 누르세요.</div>
+          <div class="canvas-stage"><canvas id="drawCanvas"></canvas></div>
+          <div class="hint">펜/지우개 모드에서는 필기하고, 스크롤 모드에서는 손가락으로 위아래 이동할 수 있습니다.</div>
         </div>
-
-        <div class="field">
-          <label for="memoryInput">다음에 안 틀리기 위한 한 줄</label>
-          <textarea class="textarea" id="memoryInput" placeholder="예: 부호 먼저 확인, 그래프 해석 먼저, 조건 문장 두 번 읽기"></textarea>
-        </div>
-
-        <div class="row2 form-actions" style="position:sticky;bottom:0;z-index:20;background:linear-gradient(to top, rgba(17,24,39,.98), rgba(17,24,39,.92), rgba(17,24,39,0));padding-top:10px;">
-          <button class="btn primary" id="saveBtn" type="button">저장</button>
-          <button class="btn" id="reviewBtn" type="button">복습 완료 표시</button>
-        </div>
+      </div>
+      <div class="field">
+        <label>다음에 안 틀리기 위한 한 줄</label>
+        <textarea class="textarea" id="memoryInput" placeholder="예: 부호 먼저 확인, 그래프 해석 먼저, 조건 문장 두 번 읽기"></textarea>
+      </div>
+      <div class="row2 form-actions">
+        <button class="btn primary" id="saveBtn" type="button">저장</button>
+        <button class="btn soft" id="reviewBtn" type="button">복습 완료 표시</button>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="footerbar">
-    <div class="footerinner">
-      <input class="quicksearch" id="quickSearch" placeholder="빠르게 검색" />
-      <button class="fab" id="newBtn">+</button>
-    </div>
+<!-- 하단 바 -->
+<div class="footerbar">
+  <div class="footerinner">
+    <input class="quicksearch" id="quickSearch" placeholder="빠르게 검색" />
+    <button class="fab" id="newBtn">+</button>
   </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const DB_NAME = "wrong_note_db_v1";
+const DB_NAME = "wrong_note_db_v2";
 const DB_VERSION = 1;
 const NOTES_STORE = "notes";
-const META_STORE = "meta";
-const DRAFT_KEY = "editor_draft";
+const DRAFT_KEY = "editor_draft_v2";
+const today = new Date().toISOString().slice(0, 10);
+
 let notes = [];
 let editingId = null;
 let problemImages = [];
 let solutionImages = [];
 let currentDrawing = null;
+let deferredInstallPrompt = null;
 
-const today = new Date().toISOString().slice(0,10);
-document.getElementById("dateInput").value = today;
+const installBanner = document.getElementById("installBanner");
+const installBtn = document.getElementById("installBtn");
+const dismissInstallBtn = document.getElementById("dismissInstallBtn");
+const toast = document.getElementById("toast");
 
-const reasonChips = [...document.querySelectorAll("#reasonChips .chip")];
-const colorBtns = [...document.querySelectorAll(".color-btn")];
-const editorOverlay = document.getElementById("editorOverlay");
-const problemImageInput = document.getElementById("problemImageInput");
-const solutionImageInput = document.getElementById("solutionImageInput");
-const problemImagePreview = document.getElementById("problemImagePreview");
-const solutionImagePreview = document.getElementById("solutionImagePreview");
-const formTitle = document.getElementById("formTitle");
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
 
-const canvas = document.getElementById("drawCanvas");
-const ctx = canvas.getContext("2d");
-let dpr = Math.max(window.devicePixelRatio || 1, 1);
-let isDrawing = false;
-let activePointerId = null;
-let currentTool = "pen";
-let penColor = "#111111";
-let penSize = Number(document.getElementById("penSize").value);
-let drawHistory = [];
-let autosaveTimer = null;
-let textDraftTimer = null;
+function closeInstallBanner() {
+  installBanner.classList.remove("show");
+}
 
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBanner.classList.add("show");
+});
 
-function openDB(){
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  closeInstallBanner();
+  showToast("앱이 설치되었습니다.");
+});
+
+installBtn?.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) {
+    showToast("브라우저 메뉴에서 홈 화면에 추가할 수 있어요.");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice.catch(() => null);
+  deferredInstallPrompt = null;
+  closeInstallBanner();
+});
+
+dismissInstallBtn?.addEventListener("click", closeInstallBanner);
+
+// ── IndexedDB ──────────────────────────────────────────────
+function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      if(!db.objectStoreNames.contains(NOTES_STORE)){
+      if (!db.objectStoreNames.contains(NOTES_STORE))
         db.createObjectStore(NOTES_STORE, { keyPath: "id" });
-      }
-      if(!db.objectStoreNames.contains(META_STORE)){
-        db.createObjectStore(META_STORE, { keyPath: "key" });
-      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
 
-async function loadNotes(){
+async function loadNotes() {
   const db = await openDB();
-  return await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const tx = db.transaction(NOTES_STORE, "readonly");
-    const store = tx.objectStore(NOTES_STORE);
-    const req = store.getAll();
+    const req = tx.objectStore(NOTES_STORE).getAll();
     req.onsuccess = () => resolve(Array.isArray(req.result) ? req.result : []);
     req.onerror = () => reject(req.error);
   });
 }
 
-async function saveNotes(){
+async function saveNotes() {
   const db = await openDB();
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const tx = db.transaction(NOTES_STORE, "readwrite");
     const store = tx.objectStore(NOTES_STORE);
-    const clearReq = store.clear();
-    clearReq.onerror = () => reject(clearReq.error);
-    clearReq.onsuccess = () => {
-      for(const note of notes){
-        store.put(note);
-      }
-    };
-    tx.oncomplete = () => resolve();
+    store.clear().onsuccess = () => notes.forEach(n => store.put(n));
+    tx.oncomplete = resolve;
     tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
   });
 }
 
-async function saveDraftToDB(draft){
-  const db = await openDB();
-  await new Promise((resolve, reject) => {
-    const tx = db.transaction(META_STORE, "readwrite");
-    tx.objectStore(META_STORE).put({ key: DRAFT_KEY, value: draft });
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
+// ── Draft (localStorage) ───────────────────────────────────
+function saveDraft() {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      editingId,
+      subject: document.getElementById("subjectInput").value,
+      unit: document.getElementById("unitInput").value,
+      type: document.getElementById("typeInput").value,
+      date: document.getElementById("dateInput").value,
+      source: document.getElementById("sourceInput").value,
+      problem: document.getElementById("problemInput").value,
+      reason: selectedReason(),
+      reasonDetail: document.getElementById("reasonDetailInput").value,
+      correct: document.getElementById("correctInput").value,
+      memory: document.getElementById("memoryInput").value,
+      problemImages,
+      solutionImages,
+      drawing: currentDrawing
+    }));
+  } catch (e) { /* 저장 실패 무시 */ }
 }
 
-async function loadDraftFromDB(){
-  const db = await openDB();
-  return await new Promise((resolve, reject) => {
-    const tx = db.transaction(META_STORE, "readonly");
-    const req = tx.objectStore(META_STORE).get(DRAFT_KEY);
-    req.onsuccess = () => resolve(req.result ? req.result.value : null);
-    req.onerror = () => reject(req.error);
-  });
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (!d || typeof d !== "object") return false;
+    editingId = d.editingId ?? null;
+    document.getElementById("subjectInput").value = d.subject || "";
+    document.getElementById("unitInput").value = d.unit || "";
+    document.getElementById("typeInput").value = d.type || "";
+    document.getElementById("dateInput").value = d.date || today;
+    document.getElementById("sourceInput").value = d.source || "";
+    document.getElementById("problemInput").value = d.problem || "";
+    document.getElementById("reasonDetailInput").value = d.reasonDetail || "";
+    document.getElementById("correctInput").value = d.correct || "";
+    document.getElementById("memoryInput").value = d.memory || "";
+    problemImages = Array.isArray(d.problemImages) ? d.problemImages : [];
+    solutionImages = Array.isArray(d.solutionImages) ? d.solutionImages : [];
+    currentDrawing = d.drawing || null;
+    syncPreviews();
+    setReasonChip(d.reason || "개념 부족");
+    document.getElementById("formTitle").textContent = editingId ? "오답 수정" : "오답 작성";
+    return true;
+  } catch { return false; }
 }
 
-async function clearDraftFromDB(){
-  const db = await openDB();
-  await new Promise((resolve, reject) => {
-    const tx = db.transaction(META_STORE, "readwrite");
-    tx.objectStore(META_STORE).delete(DRAFT_KEY);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
 }
 
-function esc(text){ return String(text ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;"); }
-
-function openEditor(){
-  editorOverlay.classList.add("open");
-  initCanvas();
-  if(currentDrawing) loadCanvasFromDataURL(currentDrawing);
-}
-function closeEditor(){
-  safeDraftSave();
-  editorOverlay.classList.remove("open");
+// ── Utils ──────────────────────────────────────────────────
+function esc(t) {
+  return String(t ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
-function selectedReason(){ const active = reasonChips.find(chip => chip.classList.contains("active")); return active ? active.dataset.value : "개념 부족"; }
-reasonChips.forEach(chip => chip.addEventListener("click", ()=>{ reasonChips.forEach(c=>c.classList.remove("active")); chip.classList.add("active"); saveDraftState(); }));
-
-function reviewLabel(status){ if(status===2) return "복습 완료"; if(status===1) return "복습 중"; return "복습 필요"; }
-function reviewBadgeClass(status){ if(status===2) return "b-review2"; if(status===1) return "b-review1"; return "b-review0"; }
-
-function renderPreview(container, items, type){
-  if(items.length === 0){ container.innerHTML = ""; return; }
-  container.innerHTML = items.map((img, idx) => `<div class="preview-item"><img src="${img}" alt="${type}-${idx}"><button type="button" class="remove-image-btn" onclick="removePreviewImage('${type}', ${idx})">삭제</button></div>`).join("");
+function genId() {
+  return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 }
-window.removePreviewImage = function(type, idx){
-  if(type==="problem") problemImages.splice(idx,1);
-  if(type==="solution") solutionImages.splice(idx,1);
-  syncPreviews();
-  saveDraftState();
-};
-function syncPreviews(){ renderPreview(problemImagePreview, problemImages, "problem"); renderPreview(solutionImagePreview, solutionImages, "solution"); }
 
+// ── Reason chips ───────────────────────────────────────────
+const reasonChips = [...document.querySelectorAll("#reasonChips .chip")];
+reasonChips.forEach(chip => chip.addEventListener("click", () => {
+  setReasonChip(chip.dataset.value);
+  saveDraft();
+}));
 
-function compressImageDataUrl(file, maxSize = 1600, quality = 0.82){
+function setReasonChip(value) {
+  reasonChips.forEach(c => c.classList.toggle("active", c.dataset.value === value));
+  if (!reasonChips.some(c => c.classList.contains("active")))
+    reasonChips[0].classList.add("active");
+}
+
+function selectedReason() {
+  return (reasonChips.find(c => c.classList.contains("active")) || reasonChips[0]).dataset.value;
+}
+
+// ── Images ─────────────────────────────────────────────────
+function compressImage(file, maxSize = 1600, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        let { width, height } = img;
-        const scale = Math.min(1, maxSize / Math.max(width, height));
-        width = Math.max(1, Math.round(width * scale));
-        height = Math.max(1, Math.round(height * scale));
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
         const c = document.createElement("canvas");
-        c.width = width;
-        c.height = height;
-        const cctx = c.getContext("2d");
-        cctx.drawImage(img, 0, 0, width, height);
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
         resolve(c.toDataURL("image/jpeg", quality));
       };
       img.onerror = reject;
@@ -424,375 +464,330 @@ function compressImageDataUrl(file, maxSize = 1600, quality = 0.82){
   });
 }
 
-function readFileAsDataURL(file){ return compressImageDataUrl(file); }
-async function handleMultiImageInput(input, targetArray){
+async function handleImageInput(input, targetArray) {
   const files = Array.from(input.files || []);
-  if(!files.length) return;
-  const loaded = await Promise.all(files.map(readFileAsDataURL));
-  targetArray.push(...loaded); input.value = ""; syncPreviews(); saveDraftState();
-}
-problemImageInput.addEventListener("change", ()=>handleMultiImageInput(problemImageInput, problemImages));
-solutionImageInput.addEventListener("change", ()=>handleMultiImageInput(solutionImageInput, solutionImages));
-
-function buildDraftPayload(includeHeavy=true){
-  return {
-    editingId,
-    subject: document.getElementById("subjectInput").value,
-    unit: document.getElementById("unitInput").value,
-    type: document.getElementById("typeInput").value,
-    date: document.getElementById("dateInput").value,
-    source: document.getElementById("sourceInput").value,
-    problem: document.getElementById("problemInput").value,
-    reason: selectedReason(),
-    reasonDetail: document.getElementById("reasonDetailInput").value,
-    correct: document.getElementById("correctInput").value,
-    memory: document.getElementById("memoryInput").value,
-    problemImages: includeHeavy ? problemImages : [],
-    solutionImages: includeHeavy ? solutionImages : [],
-    drawing: includeHeavy ? currentDrawing : null
-  };
-}
-function saveDraftState(includeHeavy=true){
-  try{
-    const existingRaw = localStorage.getItem(DRAFT_KEY);
-    let draft = buildDraftPayload(includeHeavy);
-    if(!includeHeavy && existingRaw){
-      try{
-        const existing = JSON.parse(existingRaw);
-        draft.problemImages = Array.isArray(existing.problemImages) ? existing.problemImages : [];
-        draft.solutionImages = Array.isArray(existing.solutionImages) ? existing.solutionImages : [];
-        draft.drawing = existing.drawing || null;
-      }catch{}
-    }
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  }catch{}
-}
-function scheduleTextDraftSave(){
-  if(textDraftTimer) clearTimeout(textDraftTimer);
-  textDraftTimer = setTimeout(() => saveDraftState(false), 700);
-}
-function clearDraftState(){ try{ localStorage.removeItem(DRAFT_KEY); }catch{} }
-
-function restoreDraftIfAny(){
-  try{
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if(!raw) return false;
-    const draft = JSON.parse(raw);
-    if(!draft || typeof draft !== "object") return false;
-
-    editingId = draft.editingId ?? null;
-    document.getElementById("subjectInput").value = draft.subject || "";
-    document.getElementById("unitInput").value = draft.unit || "";
-    document.getElementById("typeInput").value = draft.type || "";
-    document.getElementById("dateInput").value = draft.date || today;
-    document.getElementById("sourceInput").value = draft.source || "";
-    document.getElementById("problemInput").value = draft.problem || "";
-    document.getElementById("reasonDetailInput").value = draft.reasonDetail || "";
-    document.getElementById("correctInput").value = draft.correct || "";
-    document.getElementById("memoryInput").value = draft.memory || "";
-    problemImages = Array.isArray(draft.problemImages) ? draft.problemImages : [];
-    solutionImages = Array.isArray(draft.solutionImages) ? draft.solutionImages : [];
-    currentDrawing = draft.drawing || null;
-    syncPreviews();
-    reasonChips.forEach(c => c.classList.toggle("active", c.dataset.value === (draft.reason || "개념 부족")));
-    formTitle.textContent = editingId ? "오답 수정" : "오답 작성";
-    return true;
-  }catch{
-    return false;
-  }
+  if (!files.length) return;
+  const loaded = await Promise.all(files.map(f => compressImage(f)));
+  targetArray.push(...loaded);
+  input.value = "";
+  syncPreviews();
+  saveDraft();
 }
 
-function initCanvas(){
-  const preserved = currentDrawing || (canvas.width > 0 && hasDrawing() ? canvas.toDataURL("image/png") : null);
-  const rect = canvas.getBoundingClientRect();
+function renderPreview(container, items, type) {
+  container.innerHTML = items.map((img, idx) =>
+    `<div class="preview-item"><img src="${img}" alt="${type}-${idx}">
+     <button type="button" class="remove-image-btn" onclick="removeImg('${type}',${idx})">삭제</button></div>`
+  ).join("");
+}
+
+function syncPreviews() {
+  renderPreview(document.getElementById("problemImagePreview"), problemImages, "problem");
+  renderPreview(document.getElementById("solutionImagePreview"), solutionImages, "solution");
+}
+
+window.removeImg = function (type, idx) {
+  if (type === "problem") problemImages.splice(idx, 1);
+  if (type === "solution") solutionImages.splice(idx, 1);
+  syncPreviews();
+  saveDraft();
+};
+
+document.getElementById("problemImageInput").addEventListener("change", e =>
+  handleImageInput(e.target, problemImages));
+document.getElementById("solutionImageInput").addEventListener("change", e =>
+  handleImageInput(e.target, solutionImages));
+
+// ── Canvas ─────────────────────────────────────────────────
+const canvas = document.getElementById("drawCanvas");
+const ctx = canvas.getContext("2d");
+let dpr = Math.max(window.devicePixelRatio || 1, 1);
+let isDrawing = false;
+let lastPoint = null;
+let currentTool = "pen";
+let penColor = "#111111";
+let penSize = 5;
+let drawHistory = [];
+let autosaveTimer = null;
+const canvasStage = document.querySelector(".canvas-stage");
+
+function initCanvas(restoreDataUrl) {
   dpr = Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(1, Math.floor(620 * dpr));
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0,0,rect.width,620);
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(1, Math.floor(rect.width * dpr));
+  const cssH = canvas.offsetHeight || 900;
+  const h = Math.max(1, Math.floor(cssH * dpr));
+  canvas.width = w;
+  canvas.height = h;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fillWhite();
   drawHistory = [];
-  currentDrawing = null;
-  if(preserved){
-    setTimeout(() => loadCanvasFromDataURL(preserved), 0);
+  if (restoreDataUrl) {
+    loadCanvasImage(restoreDataUrl);
+  } else if (currentDrawing) {
+    loadCanvasImage(currentDrawing);
   } else {
     snapshotCanvas();
   }
 }
-function setTool(tool){
-  currentTool = tool;
-  document.getElementById("penToolBtn").classList.toggle("active", tool==="pen");
-  document.getElementById("eraserToolBtn").classList.toggle("active", tool==="eraser");
-}
-function setPenColor(color){
-  penColor = color;
-  colorBtns.forEach(btn => btn.classList.toggle("active", btn.dataset.color === color));
-  if(currentTool !== "eraser") setTool("pen");
-  saveDraftState();
-}
-colorBtns.forEach(btn => btn.addEventListener("click", ()=> setPenColor(btn.dataset.color)));
-document.getElementById("penToolBtn").addEventListener("click", ()=>{ setTool("pen"); saveDraftState(); });
-document.getElementById("eraserToolBtn").addEventListener("click", ()=>{ setTool("eraser"); saveDraftState(); });
-document.getElementById("penSize").addEventListener("input", e=>{ penSize = Number(e.target.value); saveDraftState(); });
 
-function applyBrush(){
-  if(currentTool === "eraser"){ ctx.globalCompositeOperation = "destination-out"; ctx.strokeStyle = "rgba(0,0,0,1)"; ctx.lineWidth = penSize * 2.3; }
-  else { ctx.globalCompositeOperation = "source-over"; ctx.strokeStyle = penColor; ctx.lineWidth = penSize; }
-  ctx.lineCap = "round"; ctx.lineJoin = "round";
+function fillWhite() {
+  const w = canvas.width / dpr;
+  const h = canvas.height / dpr;
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, w, h);
 }
-function hasDrawing(){
+
+function snapshotCanvas() {
+  try {
+    const url = canvas.toDataURL("image/png");
+    drawHistory.push(url);
+    if (drawHistory.length > 50) drawHistory.shift();
+    currentDrawing = isCanvasBlank() ? null : url;
+  } catch {}
+}
+
+function isCanvasBlank() {
   const blank = document.createElement("canvas");
   blank.width = canvas.width; blank.height = canvas.height;
   const bctx = blank.getContext("2d");
-  bctx.fillStyle = "#ffffff"; bctx.fillRect(0,0,blank.width,blank.height);
-  return canvas.toDataURL("image/png") !== blank.toDataURL("image/png");
+  bctx.fillStyle = "#fff";
+  bctx.fillRect(0, 0, blank.width, blank.height);
+  return canvas.toDataURL() === blank.toDataURL();
 }
-function snapshotCanvas(){
-  try{
-    const dataUrl = canvas.toDataURL("image/png");
-    drawHistory.push(dataUrl);
-    if(drawHistory.length > 50) drawHistory.shift();
-    currentDrawing = hasDrawing() ? dataUrl : null;
-  }catch{}
-}
-function scheduleCanvasAutosave(){
-  if(autosaveTimer) clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(() => {
-    snapshotCanvas();
-    saveDraftState();
-  }, 300);
-}
-function safeDraftSave(){
-  snapshotCanvas();
-  saveDraftState();
-}
-function clearCanvas(push=true){
-  const rect = canvas.getBoundingClientRect();
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0,0,rect.width,620);
-  if(push){
-    drawHistory = [];
-    snapshotCanvas();
-    saveDraftState();
-  } else {
-    drawHistory = [];
-    currentDrawing = null;
-  }
-}
-function loadCanvasFromDataURL(dataUrl){
-  const rect = canvas.getBoundingClientRect();
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0,0,rect.width,620);
-  drawHistory = [];
-  currentDrawing = null;
-  if(!dataUrl){
-    snapshotCanvas();
-    return;
-  }
+
+function loadCanvasImage(dataUrl) {
+  if (!dataUrl) { snapshotCanvas(); return; }
   const img = new Image();
-  img.onload = ()=>{
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0,rect.width,620);
-    ctx.drawImage(img, 0, 0, rect.width, 620);
-    drawHistory = [canvas.toDataURL("image/png")];
-    currentDrawing = canvas.toDataURL("image/png");
-    saveDraftState();
+  img.onload = () => {
+    fillWhite();
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    ctx.drawImage(img, 0, 0, w, h);
+    snapshotCanvas();
   };
   img.src = dataUrl;
 }
-function getPoint(e){ const rect = canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
-function isStylusEvent(e){
-  return e && e.pointerType === "pen";
-}
-function getTouchStylus(touchList){
-  if(!touchList) return null;
-  for(const t of Array.from(touchList)){
-    if(t.touchType === "stylus") return t;
+
+function applyBrush() {
+  if (currentTool === "eraser") {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+    ctx.lineWidth = penSize * 2.5;
+  } else {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = penColor;
+    ctx.lineWidth = penSize;
   }
-  return null;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 }
-function getTouchPoint(t){
+
+function getCanvasPoint(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
-  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  return { x: clientX - rect.left, y: clientY - rect.top };
 }
 
-canvas.addEventListener("pointerdown", e=>{
-  if(!isStylusEvent(e)) return;
-  e.preventDefault();
-  activePointerId = e.pointerId;
+function startDraw(x, y) {
+  if (currentTool === "move") return;
   isDrawing = true;
-  const p = getPoint(e);
+  lastPoint = { x, y };
   applyBrush();
   ctx.beginPath();
-  ctx.moveTo(p.x, p.y);
-  try{ canvas.setPointerCapture(e.pointerId); }catch{}
-});
-canvas.addEventListener("pointermove", e=>{
-  if(!isDrawing || e.pointerId !== activePointerId) return;
-  if(!isStylusEvent(e)) return;
-  e.preventDefault();
-  const p = getPoint(e);
-  applyBrush();
-  ctx.lineTo(p.x, p.y);
-  ctx.stroke();
-  scheduleCanvasAutosave();
-});
-function finishDraw(e){
-  if(!isDrawing || e.pointerId !== activePointerId) return;
-  e.preventDefault();
-  isDrawing = false;
-  activePointerId = null;
-  ctx.closePath();
-  snapshotCanvas();
-  saveDraftState();
+  ctx.moveTo(x, y);
 }
-canvas.addEventListener("pointerup", finishDraw);
-canvas.addEventListener("pointerleave", finishDraw);
-canvas.addEventListener("pointercancel", finishDraw);
 
-
-canvas.addEventListener("touchstart", e=>{
-  const stylusTouch = getTouchStylus(e.changedTouches);
-  if(!stylusTouch) return;
-  e.preventDefault();
-  isDrawing = true;
-  activePointerId = "touch-" + stylusTouch.identifier;
-  const p = getTouchPoint(stylusTouch);
+function moveDraw(x, y) {
+  if (!isDrawing) return;
   applyBrush();
-  ctx.beginPath();
-  ctx.moveTo(p.x, p.y);
-}, {passive:false});
-
-canvas.addEventListener("touchmove", e=>{
-  if(!isDrawing || !String(activePointerId).startsWith("touch-")) return;
-  const stylusTouch = getTouchStylus(e.changedTouches) || getTouchStylus(e.touches);
-  if(!stylusTouch) return;
-  e.preventDefault();
-  const p = getTouchPoint(stylusTouch);
-  applyBrush();
-  ctx.lineTo(p.x, p.y);
+  ctx.lineTo(x, y);
   ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  lastPoint = { x, y };
   scheduleCanvasAutosave();
-}, {passive:false});
+}
 
-canvas.addEventListener("touchend", e=>{
-  if(!isDrawing || !String(activePointerId).startsWith("touch-")) return;
-  const stylusTouch = getTouchStylus(e.changedTouches);
-  if(!stylusTouch) return;
-  e.preventDefault();
+function endDraw() {
+  if (!isDrawing) return;
   isDrawing = false;
-  activePointerId = null;
+  lastPoint = null;
   ctx.closePath();
   snapshotCanvas();
-  saveDraftState();
-}, {passive:false});
+  saveDraft();
+}
 
-canvas.addEventListener("touchcancel", e=>{
-  if(!isDrawing || !String(activePointerId).startsWith("touch-")) return;
+function scheduleCanvasAutosave() {
+  if (autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => { snapshotCanvas(); saveDraft(); }, 400);
+}
+
+// Pointer 이벤트 (마우스 + 스타일러스 + 터치 모두 지원)
+canvas.addEventListener("pointerdown", e => {
+  if (currentTool === "move") return;
   e.preventDefault();
-  isDrawing = false;
-  activePointerId = null;
-  ctx.closePath();
-  snapshotCanvas();
-  saveDraftState();
-}, {passive:false});
+  const p = getCanvasPoint(e.clientX, e.clientY);
+  startDraw(p.x, p.y);
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove", e => {
+  if (currentTool === "move") return;
+  e.preventDefault();
+  if (!isDrawing) return;
+  const p = getCanvasPoint(e.clientX, e.clientY);
+  moveDraw(p.x, p.y);
+});
+canvas.addEventListener("pointerup", e => { if (currentTool !== "move") { e.preventDefault(); endDraw(); } });
+canvas.addEventListener("pointercancel", e => { if (currentTool !== "move") { e.preventDefault(); endDraw(); } });
 
+// 툴 버튼
+function setTool(tool) {
+  currentTool = tool;
+  document.getElementById("penToolBtn").classList.toggle("active", tool === "pen");
+  document.getElementById("eraserToolBtn").classList.toggle("active", tool === "eraser");
+  document.getElementById("moveToolBtn").classList.toggle("active", tool === "move");
+  canvasStage.style.touchAction = tool === "move" ? "pan-y" : "none";
+  canvasStage.style.cursor = tool === "move" ? "grab" : "crosshair";
+}
+document.getElementById("penToolBtn").addEventListener("click", () => setTool("pen"));
+document.getElementById("eraserToolBtn").addEventListener("click", () => setTool("eraser"));
+document.getElementById("moveToolBtn").addEventListener("click", () => setTool("move"));
+document.getElementById("penSize").addEventListener("input", e => { penSize = Number(e.target.value); });
 
-document.getElementById("undoBtn").addEventListener("click", ()=>{
-  if(drawHistory.length <= 1){ clearCanvas(); return; }
+const colorBtns = [...document.querySelectorAll(".color-btn")];
+colorBtns.forEach(btn => btn.addEventListener("click", () => {
+  penColor = btn.dataset.color;
+  colorBtns.forEach(b => b.classList.toggle("active", b === btn));
+  setTool("pen");
+}));
+
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (drawHistory.length <= 1) { clearCanvas(); return; }
   drawHistory.pop();
-  loadCanvasFromDataURL(drawHistory[drawHistory.length - 1]);
+  loadCanvasImage(drawHistory[drawHistory.length - 1]);
 });
-document.getElementById("clearCanvasBtn").addEventListener("click", ()=>clearCanvas());
 
-function getFormData(){
+document.getElementById("clearCanvasBtn").addEventListener("click", clearCanvas);
+
+function clearCanvas() {
+  fillWhite();
+  drawHistory = [];
+  currentDrawing = null;
+  snapshotCanvas();
+  saveDraft();
+}
+
+// ── Editor open / close ────────────────────────────────────
+const editorOverlay = document.getElementById("editorOverlay");
+
+function openEditor() {
+  editorOverlay.classList.add("open");
+  editorOverlay.scrollTop = 0;
+  setTimeout(() => { initCanvas(currentDrawing); setTool("pen"); }, 60);
+}
+
+function closeEditor() {
+  snapshotCanvas();
+  saveDraft();
+  editorOverlay.classList.remove("open");
+}
+
+// ── Form ───────────────────────────────────────────────────
+document.getElementById("dateInput").value = today;
+
+function getFormData() {
   const problem = document.getElementById("problemInput").value.trim();
-  if(!problem){ alert("문제 / 제목을 입력하세요."); document.getElementById("problemInput").focus(); return null; }
+  if (!problem) {
+    alert("문제 / 제목을 입력하세요.");
+    document.getElementById("problemInput").focus();
+    return null;
+  }
   return {
-    id: editingId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random())),
+    id: editingId || genId(),
     subject: document.getElementById("subjectInput").value.trim(),
     unit: document.getElementById("unitInput").value.trim(),
     type: document.getElementById("typeInput").value.trim(),
     date: document.getElementById("dateInput").value || today,
     source: document.getElementById("sourceInput").value.trim(),
     problem,
-    problemImages:[...problemImages],
-    reason:selectedReason(),
-    reasonDetail:document.getElementById("reasonDetailInput").value.trim(),
-    correct:document.getElementById("correctInput").value.trim(),
-    solutionImages:[...solutionImages],
-    drawing:currentDrawing,
-    memory:document.getElementById("memoryInput").value.trim(),
-    reviewStatus:0,
-    createdAt:Date.now()
+    problemImages: [...problemImages],
+    reason: selectedReason(),
+    reasonDetail: document.getElementById("reasonDetailInput").value.trim(),
+    correct: document.getElementById("correctInput").value.trim(),
+    solutionImages: [...solutionImages],
+    drawing: currentDrawing,
+    memory: document.getElementById("memoryInput").value.trim(),
+    reviewStatus: 0,
+    createdAt: Date.now()
   };
 }
-function resetForm(){
+
+function resetForm() {
   editingId = null;
-  formTitle.textContent = "오답 작성";
-  document.getElementById("subjectInput").value = "";
-  document.getElementById("unitInput").value = "";
-  document.getElementById("typeInput").value = "";
+  document.getElementById("formTitle").textContent = "오답 작성";
+  ["subjectInput","unitInput","typeInput","sourceInput","problemInput",
+   "reasonDetailInput","correctInput","memoryInput"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
   document.getElementById("dateInput").value = today;
-  document.getElementById("sourceInput").value = "";
-  document.getElementById("problemInput").value = "";
-  document.getElementById("reasonDetailInput").value = "";
-  document.getElementById("correctInput").value = "";
-  document.getElementById("memoryInput").value = "";
   problemImages = []; solutionImages = []; currentDrawing = null;
-  problemImageInput.value = ""; solutionImageInput.value = "";
+  document.getElementById("problemImageInput").value = "";
+  document.getElementById("solutionImageInput").value = "";
   syncPreviews();
-  reasonChips.forEach(c=>c.classList.remove("active")); reasonChips[0].classList.add("active");
+  setReasonChip("개념 부족");
   clearCanvas();
-  clearDraftState();
+  clearDraft();
 }
-async function saveCurrent(){
+
+async function saveCurrent() {
   const saveBtn = document.getElementById("saveBtn");
-  if(saveBtn) saveBtn.disabled = true;
-  try{
-    safeDraftSave();
+  saveBtn.disabled = true;
+  try {
+    snapshotCanvas();
     const data = getFormData();
-    if(!data) return;
-    if(editingId){
+    if (!data) return;
+    if (editingId) {
       const idx = notes.findIndex(n => n.id === editingId);
-      if(idx !== -1){ data.reviewStatus = notes[idx].reviewStatus; data.createdAt = notes[idx].createdAt; notes[idx] = data; }
-    }else{
+      if (idx !== -1) {
+        data.reviewStatus = notes[idx].reviewStatus;
+        data.createdAt = notes[idx].createdAt;
+        notes[idx] = data;
+      }
+    } else {
       notes.unshift(data);
     }
     await saveNotes();
-    await clearDraftState();
+    clearDraft();
     resetForm();
     render();
     closeEditor();
-  }catch(err){
-    alert("저장 중 문제가 생겼습니다. 이미지 수를 줄여보세요");
+  showToast("복습 완료로 표시했습니다.");
+    showToast(editingId ? "오답이 수정되었습니다." : "오답이 저장되었습니다.");
+  } catch (err) {
+    alert("저장 중 오류가 발생했습니다. 이미지 수를 줄여보세요.");
     console.error(err);
-  }finally{
-    if(saveBtn) saveBtn.disabled = false;
+  } finally {
+    saveBtn.disabled = false;
   }
 }
-async function markReviewDone(){
-  safeDraftSave();
-  if(!editingId){ alert("먼저 목록에서 수정할 오답을 선택하세요."); return; }
+
+async function markReviewDone() {
+  if (!editingId) { alert("목록에서 수정할 오답을 먼저 선택하세요."); return; }
   const idx = notes.findIndex(n => n.id === editingId);
-  if(idx === -1) return;
+  if (idx === -1) return;
   notes[idx].reviewStatus = 2;
   await saveNotes();
-  await clearDraftState();
+  clearDraft();
   render();
   closeEditor();
 }
-function openEdit(id){
+
+function openEdit(id) {
   const note = notes.find(n => n.id === id);
-  if(!note) return;
+  if (!note) return;
   editingId = note.id;
-  formTitle.textContent = "오답 수정";
+  document.getElementById("formTitle").textContent = "오답 수정";
   document.getElementById("subjectInput").value = note.subject || "";
   document.getElementById("unitInput").value = note.unit || "";
   document.getElementById("typeInput").value = note.type || "";
@@ -806,59 +801,79 @@ function openEdit(id){
   solutionImages = Array.isArray(note.solutionImages) ? [...note.solutionImages] : [];
   currentDrawing = note.drawing || null;
   syncPreviews();
-  reasonChips.forEach(c => c.classList.toggle("active", c.dataset.value === (note.reason || "개념 부족")));
+  setReasonChip(note.reason || "개념 부족");
   openEditor();
-  setTimeout(()=>{
-    loadCanvasFromDataURL(currentDrawing);
-    saveDraftState();
-  }, 30);
 }
-function cycleReview(id){
+
+// ── Review / Delete / Duplicate ────────────────────────────
+function reviewLabel(s) { return s === 2 ? "복습 완료" : s === 1 ? "복습 중" : "복습 필요"; }
+function reviewBadgeClass(s) { return s === 2 ? "b-review2" : s === 1 ? "b-review1" : "b-review0"; }
+
+function cycleReview(id) {
   const idx = notes.findIndex(n => n.id === id);
-  if(idx === -1) return;
+  if (idx === -1) return;
   notes[idx].reviewStatus = (notes[idx].reviewStatus + 1) % 3;
   saveNotes();
   render();
+  showToast("오답을 삭제했습니다.");
+  showToast("복습 상태를 변경했습니다.");
 }
-function removeNote(id){
+
+function removeNote(id) {
   const note = notes.find(n => n.id === id);
-  if(!note) return;
-  if(!confirm(`'${note.problem.slice(0,20)}' 삭제할까요?`)) return;
+  if (!note) return;
+  if (!confirm(`'${note.problem.slice(0, 20)}' 삭제할까요?`)) return;
   notes = notes.filter(n => n.id !== id);
-  if(editingId === id) resetForm();
+  if (editingId === id) resetForm();
   saveNotes();
   render();
+  showToast("오답을 복제했습니다.");
 }
-function duplicateNote(id){
+
+function duplicateNote(id) {
   const note = notes.find(n => n.id === id);
-  if(!note) return;
-  notes.unshift({...note, id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()), problem: note.problem + " (복사본)", reviewStatus:0, createdAt:Date.now()});
+  if (!note) return;
+  notes.unshift({ ...note, id: genId(), problem: note.problem + " (복사본)", reviewStatus: 0, createdAt: Date.now() });
   saveNotes();
   render();
 }
-function filteredNotes(){
-  const keyword = (document.getElementById("searchInput").value || document.getElementById("quickSearch").value || "").trim().toLowerCase();
+
+window.openEdit = openEdit;
+window.cycleReview = cycleReview;
+window.removeNote = removeNote;
+window.duplicateNote = duplicateNote;
+
+// ── Filter & Render ────────────────────────────────────────
+function filteredNotes() {
+  const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
   const subjectFilter = document.getElementById("subjectFilter").value.trim().toLowerCase();
   const reviewFilter = document.getElementById("reviewFilter").value;
-  return [...notes].filter(note => {
-    const matchesKeyword = !keyword || [note.problem, note.subject, note.unit, note.reason, note.reasonDetail, note.correct, note.memory, note.source, note.type].join(" ").toLowerCase().includes(keyword);
-    const matchesSubject = !subjectFilter || (note.subject || "").toLowerCase().includes(subjectFilter);
-    const matchesReview = reviewFilter === "전체" || reviewLabel(note.reviewStatus) === reviewFilter;
-    return matchesKeyword && matchesSubject && matchesReview;
-  }).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+  return [...notes]
+    .filter(n => {
+      const text = [n.problem, n.subject, n.unit, n.reason, n.reasonDetail, n.correct, n.memory, n.source, n.type].join(" ").toLowerCase();
+      return (!keyword || text.includes(keyword))
+        && (!subjectFilter || (n.subject || "").toLowerCase().includes(subjectFilter))
+        && (reviewFilter === "전체" || reviewLabel(n.reviewStatus) === reviewFilter);
+    })
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
-function renderSummary(){
+
+function renderSummary() {
   document.getElementById("totalCount").textContent = notes.length;
   document.getElementById("todayCount").textContent = notes.filter(n => n.date === today).length;
   document.getElementById("needReviewCount").textContent = notes.filter(n => n.reviewStatus !== 2).length;
   document.getElementById("doneCount").textContent = notes.filter(n => n.reviewStatus === 2).length;
 }
-function render(){
+
+function render() {
   renderSummary();
-  const list = document.getElementById("list");
   const data = filteredNotes();
   document.getElementById("listMeta").textContent = `${data.length}개 표시 중`;
-  if(!data.length){ list.innerHTML = `<div class="empty">아직 정리된 오답이 없습니다. 아래 + 버튼을 눌러 첫 오답을 작성하세요.</div>`; return; }
+  const list = document.getElementById("list");
+  if (!data.length) {
+    list.innerHTML = `<div class="empty"><strong>첫 오답을 만들어 보세요</strong>틀린 이유와 다시 푼 핵심을 함께 적어두면 복습할 때 훨씬 빨라집니다.<div class="empty-actions"><button class="btn primary" type="button" onclick="startFirstNote()">첫 오답 작성</button><button class="btn" type="button" onclick="addSample()">예시 추가</button></div></div>`;
+    return;
+  }
   list.innerHTML = data.map(note => `
     <div class="card">
       <div class="card-top">
@@ -871,11 +886,11 @@ function render(){
         <div class="meta">${esc(note.date || "")}${note.source ? " · " + esc(note.source) : ""}</div>
       </div>
       <div class="problem">${esc(note.problem)}</div>
-      ${(Array.isArray(note.problemImages) && note.problemImages.length) ? `<div class="block"><h3>문제 이미지</h3><div class="image-grid">${note.problemImages.map(img => `<div class="image-item"><img src="${img}" alt="problem-image"></div>`).join("")}</div></div>` : ""}
+      ${note.problemImages?.length ? `<div class="block"><h3>문제 이미지</h3><div class="image-grid">${note.problemImages.map(img => `<div class="image-item"><img src="${img}" alt=""></div>`).join("")}</div></div>` : ""}
       <div class="block"><h3>틀린 이유</h3><p><strong>${esc(note.reason || "")}</strong>${note.reasonDetail ? "\n" + esc(note.reasonDetail) : ""}</p></div>
       <div class="block"><h3>다시 푼 핵심</h3><p>${esc(note.correct || "아직 정리 안 함")}</p></div>
-      ${(Array.isArray(note.solutionImages) && note.solutionImages.length) ? `<div class="block"><h3>풀이 이미지</h3><div class="image-grid">${note.solutionImages.map(img => `<div class="image-item"><img src="${img}" alt="solution-image"></div>`).join("")}</div></div>` : ""}
-      ${note.drawing ? `<div class="block"><h3>풀이 필기</h3><div class="drawing-preview"><img src="${note.drawing}" alt="drawing-image"></div></div>` : ""}
+      ${note.solutionImages?.length ? `<div class="block"><h3>풀이 이미지</h3><div class="image-grid">${note.solutionImages.map(img => `<div class="image-item"><img src="${img}" alt=""></div>`).join("")}</div></div>` : ""}
+      ${note.drawing ? `<div class="block"><h3>풀이 필기</h3><div style="border-radius:12px;overflow:hidden;background:#fff"><img src="${note.drawing}" style="width:100%;display:block" alt=""></div></div>` : ""}
       <div class="block"><h3>다음에 안 틀리기 위한 한 줄</h3><p>${esc(note.memory || "아직 정리 안 함")}</p></div>
       <div class="card-actions">
         <button class="btn" onclick="openEdit('${note.id}')">수정</button>
@@ -885,96 +900,115 @@ function render(){
       </div>
     </div>`).join("");
 }
-function exportData(){
-  const blob = new Blob([JSON.stringify(notes, null, 2)], {type:"application/json"});
+
+// ── Export / Import ────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(notes, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "wrong_note_reliable_autosave.json"; a.click(); URL.revokeObjectURL(a.href);
+  a.href = URL.createObjectURL(blob);
+  a.download = "wrong_note_backup.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast("백업 파일을 내보냈습니다.");
 }
-function importData(file){
+
+function importData(file) {
   const reader = new FileReader();
   reader.onload = async () => {
-    try{
+    try {
       const parsed = JSON.parse(reader.result);
-      if(!Array.isArray(parsed)) throw new Error();
-      notes = parsed.map(note => ({...note, problemImages:Array.isArray(note.problemImages)?note.problemImages:[], solutionImages:Array.isArray(note.solutionImages)?note.solutionImages:[], drawing:note.drawing||null}));
+      if (!Array.isArray(parsed)) throw new Error();
+      notes = parsed.map(n => ({
+        ...n,
+        problemImages: Array.isArray(n.problemImages) ? n.problemImages : [],
+        solutionImages: Array.isArray(n.solutionImages) ? n.solutionImages : [],
+        drawing: n.drawing || null
+      }));
       await saveNotes();
       resetForm();
       render();
-    }catch{ alert("올바른 JSON 파일이 아닙니다."); }
+      showToast("백업 파일을 불러왔습니다.");
+    } catch { alert("올바른 JSON 파일이 아닙니다."); }
   };
   reader.readAsText(file, "utf-8");
 }
-async function addSample(){
-  if(notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까요?")) return;
-  notes.unshift({id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), subject:"수학", unit:"적분", type:"계산 실수", date:today, source:"기출 21번", problem:"부분적분을 두 번 써야 하는 문제였는데 첫 단계에서 부호를 잘못 처리함.", problemImages:[], reason:"계산 실수", reasonDetail:"미분되는 항과 적분되는 항을 바꿔 적었고 마지막 부호 확인을 안 함.", correct:"u=x, dv=e^x dx로 놓고 부분적분 후 다시 한 번 적용. 마지막에 상수항 정리까지 확인.", solutionImages:[], drawing:null, memory:"부분적분 문제는 식 변형 끝난 뒤 부호를 한 번 더 체크.", reviewStatus:1, createdAt:Date.now()});
+
+async function addSample() {
+  if (notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까요?")) return;
+  notes.unshift({
+    id: genId(), subject: "수학", unit: "적분", type: "계산 실수",
+    date: today, source: "기출 21번",
+    problem: "부분적분을 두 번 써야 하는 문제였는데 첫 단계에서 부호를 잘못 처리함.",
+    problemImages: [], reason: "계산 실수",
+    reasonDetail: "미분되는 항과 적분되는 항을 바꿔 적었고 마지막 부호 확인을 안 함.",
+    correct: "u=x, dv=eˣdx로 놓고 부분적분 후 다시 한 번 적용. 마지막에 상수항 정리까지 확인.",
+    solutionImages: [], drawing: null,
+    memory: "부분적분 문제는 식 변형 끝난 뒤 부호를 한 번 더 체크.",
+    reviewStatus: 1, createdAt: Date.now()
+  });
   await saveNotes();
   render();
 }
 
-
-
-
-
-function addIpadTouchClick(id, handler){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.addEventListener("touchend", e => {
-    const t = e.changedTouches && e.changedTouches[0];
-    if(!t) return;
-    const hit = document.elementFromPoint(t.clientX, t.clientY);
-    if(hit === el || el.contains(hit)){
-      e.preventDefault();
-      e.stopPropagation();
-      handler(e);
-    }
-  }, {passive:false});
-}
-
+// ── Event bindings ─────────────────────────────────────────
 document.getElementById("saveBtn").addEventListener("click", saveCurrent);
-addIpadTouchClick("saveBtn", saveCurrent);
 document.getElementById("reviewBtn").addEventListener("click", markReviewDone);
-addIpadTouchClick("reviewBtn", markReviewDone);
 document.getElementById("resetFormBtn").addEventListener("click", resetForm);
-addIpadTouchClick("resetFormBtn", resetForm);
 document.getElementById("closeEditorBtn").addEventListener("click", closeEditor);
-addIpadTouchClick("closeEditorBtn", closeEditor);
 document.getElementById("exportBtn").addEventListener("click", exportData);
-addIpadTouchClick("exportBtn", exportData);
-document.getElementById("importBtn").addEventListener("click", ()=>document.getElementById("importFile").click());
-addIpadTouchClick("importBtn", ()=>document.getElementById("importFile").click());
-document.getElementById("importFile").addEventListener("change", e=>{ const file = e.target.files?.[0]; if(file) importData(file); e.target.value = ""; });
-document.getElementById("sampleBtn").addEventListener("click", addSample);
-addIpadTouchClick("sampleBtn", addSample);
-document.getElementById("newBtn").addEventListener("click", async ()=>{
-
-  resetForm();
-  await restoreDraftIfAny();
-  openEditor();
-  document.getElementById("problemInput").focus();
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change", e => {
+  const file = e.target.files?.[0];
+  if (file) importData(file);
+  e.target.value = "";
 });
-document.getElementById("searchInput").addEventListener("input", e=>{ document.getElementById("quickSearch").value = e.target.value; render(); });
-document.getElementById("quickSearch").addEventListener("input", e=>{ document.getElementById("searchInput").value = e.target.value; render(); });
+window.addSample = addSample;
+window.startFirstNote = function () { resetForm(); loadDraft(); openEditor(); };
+document.getElementById("sampleBtn").addEventListener("click", addSample);
+document.getElementById("newBtn").addEventListener("click", () => {
+  resetForm();
+  loadDraft();
+  openEditor();
+});
+
+// 검색 — quickSearch ↔ searchInput 단방향 동기화 (루프 방지)
+document.getElementById("searchInput").addEventListener("input", e => {
+  document.getElementById("quickSearch").value = e.target.value;
+  render();
+});
+document.getElementById("quickSearch").addEventListener("input", e => {
+  document.getElementById("searchInput").value = e.target.value;
+  render();
+});
 document.getElementById("subjectFilter").addEventListener("input", render);
 document.getElementById("reviewFilter").addEventListener("change", render);
 
-["subjectInput","unitInput","typeInput","dateInput","sourceInput","problemInput","reasonDetailInput","correctInput","memoryInput"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", scheduleTextDraftSave);
-  document.getElementById(id).addEventListener("change", () => saveDraftState(false));
+// 텍스트 입력 자동 초안 저장
+["subjectInput","unitInput","typeInput","dateInput","sourceInput",
+ "problemInput","reasonDetailInput","correctInput","memoryInput"].forEach(id => {
+  document.getElementById(id).addEventListener("input", saveDraft);
 });
 
-document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "hidden") safeDraftSave(); });
-window.addEventListener("pagehide", safeDraftSave);
-window.addEventListener("beforeunload", safeDraftSave);
-window.addEventListener("resize", ()=>{ if(editorOverlay.classList.contains("open")) initCanvas(); });
+// 앱 숨김 / 종료 시 초안 저장
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { snapshotCanvas(); saveDraft(); }
+});
+window.addEventListener("pagehide", () => { snapshotCanvas(); saveDraft(); });
 
-window.openEdit = openEdit; window.cycleReview = cycleReview; window.removeNote = removeNote; window.duplicateNote = duplicateNote;
+// 화면 회전 / 리사이즈 시 캔버스 재초기화
+window.addEventListener("resize", () => {
+  if (editorOverlay.classList.contains("open")) initCanvas(currentDrawing);
+});
 
-async function initApp(){
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+// ── Init ───────────────────────────────────────────────────
+async function initApp() {
   notes = await loadNotes();
-  initCanvas();
-  setTool("pen");
-  setPenColor("#111111");
-  resetForm();
   render();
 }
 initApp();
