@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b1220" />
 <link rel="manifest" href="manifest.json" />
-<title>오답노트 - 필기 & 복습</title>
-<meta name="description" content="틀린 문제를 정리하고 필기하며 복습까지 관리하는 오답노트 앱" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="오답노트" />
+<title>오답노트</title>
 <style>
 :root{
   --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --panel3:#0f172a; --line:#334155;
@@ -26,10 +22,6 @@ button,input,select,textarea{font:inherit}
 .top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
 .title{font-size:34px;font-weight:800;letter-spacing:-.03em}
 .sub{color:var(--muted);font-size:15px;margin-top:6px;line-height:1.5}
-.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:14px 16px;border:1px solid #1d4ed8;background:linear-gradient(135deg,#0f172a,#172554);border-radius:18px;box-shadow:var(--shadow)}
-.install-banner.show{display:flex}
-.install-text{font-size:14px;line-height:1.5;color:#dbeafe}
-.install-actions{display:flex;gap:8px;flex-wrap:wrap}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .btn{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-weight:700;box-shadow:var(--shadow);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .btn.primary{background:var(--accent);border-color:transparent;color:#fff}
@@ -70,18 +62,13 @@ button,input,select,textarea{font:inherit}
 .preview-item img,.image-item img{width:100%;height:100%;min-height:140px;object-fit:cover;display:block}
 .remove-image-btn{position:absolute;top:6px;right:6px;min-height:auto;padding:7px 9px;border-radius:10px;font-size:12px;background:rgba(239,68,68,.92);color:white;border:none;cursor:pointer}
 .hint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
-.empty strong{display:block;color:var(--text);font-size:18px;margin-bottom:8px}
-.empty-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
-.canvas-help{font-size:13px;color:var(--muted);padding:10px 12px;background:#0f172a;border-bottom:1px solid var(--line)}
-.toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-bottom));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#111827;color:#e5e7eb;border:1px solid var(--line);padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);transition:.22s ease;z-index:300;max-width:min(92vw,480px);font-size:14px}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .canvas-wrap{margin-top:10px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;position:relative;z-index:0}
 .canvas-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:#0f172a;border-bottom:1px solid var(--line);align-items:center;user-select:none;-webkit-user-select:none}
 .tool-btn{min-height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer;touch-action:manipulation}
 .tool-btn.active{background:var(--accent);border-color:transparent;color:white}
 .stroke-range{width:120px;accent-color:#3b82f6}
-.canvas-stage{position:relative;background:#fff;user-select:none;-webkit-user-select:none;overflow:auto;max-height:min(70vh,720px);touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-#drawCanvas{display:block;width:100%;height:900px;background:#fff;touch-action:none;-webkit-user-select:none;user-select:none}
+.canvas-stage{position:relative;background:#fff;touch-action:pan-y;user-select:none;-webkit-user-select:none;overflow:hidden}
+#drawCanvas{display:block;width:100%;height:520px;background:#fff;touch-action:pan-y;-webkit-user-select:none;user-select:none}
 .color-buttons{display:flex;gap:6px;flex-wrap:wrap}
 .color-btn{min-height:40px;padding:0 13px;border-radius:12px;border:2px solid transparent;color:white;cursor:pointer;font-size:12px;font-weight:700;touch-action:manipulation}
 .color-btn.active{border-color:#fff}
@@ -101,7 +88,6 @@ button,input,select,textarea{font:inherit}
 .form-actions{position:sticky;bottom:0;z-index:20;background:linear-gradient(to top, rgba(17,24,39,.98) 80%, rgba(17,24,39,0));padding-top:10px}
 @media (max-width:1100px){
   .summary{grid-template-columns:repeat(2,1fr)}
-  .install-banner{align-items:flex-start;flex-direction:column}
   .searchbar{grid-template-columns:1fr}
   .editor-shell{padding-left:12px;padding-right:12px}
   #drawCanvas{height:400px}
@@ -115,21 +101,13 @@ button,input,select,textarea{font:inherit}
   <div class="top">
     <div>
       <div class="title">오답노트</div>
-      <div class="sub">틀린 문제를 적고, 필기하고, 다시 복습할 수 있게 정리하세요.</div>
+      <div class="sub">+ 버튼을 눌러 오답노트를 작성하세요.</div>
     </div>
     <div class="actions">
       <button class="btn soft" id="sampleBtn">예시 추가</button>
       <button class="btn" id="exportBtn">내보내기</button>
       <button class="btn" id="importBtn">불러오기</button>
       <input type="file" id="importFile" accept=".json" hidden />
-    </div>
-  </div>
-
-  <div class="install-banner" id="installBanner">
-    <div class="install-text"><strong>앱처럼 설치해서 더 편하게 쓰기</strong><br>홈 화면에 추가하면 전체화면으로 빠르게 열 수 있어요.</div>
-    <div class="install-actions">
-      <button class="btn primary" id="installBtn" type="button">설치</button>
-      <button class="btn" id="dismissInstallBtn" type="button">닫기</button>
     </div>
   </div>
 
@@ -234,7 +212,6 @@ button,input,select,textarea{font:inherit}
           <div class="canvas-toolbar">
             <button type="button" class="tool-btn active" id="penToolBtn">펜</button>
             <button type="button" class="tool-btn" id="eraserToolBtn">지우개</button>
-            <button type="button" class="tool-btn" id="moveToolBtn">스크롤</button>
             <div class="color-buttons">
               <button type="button" class="color-btn black active" data-color="#111111">검정</button>
               <button type="button" class="color-btn blue" data-color="#2563eb">파랑</button>
@@ -244,9 +221,7 @@ button,input,select,textarea{font:inherit}
             <button type="button" class="tool-btn" id="undoBtn">되돌리기</button>
             <button type="button" class="tool-btn" id="clearCanvasBtn">전체 지우기</button>
           </div>
-          <div class="canvas-help">펜으로 쓸 때는 펜/지우개, 화면을 움직일 때는 스크롤 버튼을 누르세요.</div>
           <div class="canvas-stage"><canvas id="drawCanvas"></canvas></div>
-          <div class="hint">펜/지우개 모드에서는 필기하고, 스크롤 모드에서는 손가락으로 위아래 이동할 수 있습니다.</div>
         </div>
       </div>
       <div class="field">
@@ -269,8 +244,6 @@ button,input,select,textarea{font:inherit}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 const DB_NAME = "wrong_note_db_v2";
 const DB_VERSION = 1;
@@ -283,48 +256,6 @@ let editingId = null;
 let problemImages = [];
 let solutionImages = [];
 let currentDrawing = null;
-let deferredInstallPrompt = null;
-
-const installBanner = document.getElementById("installBanner");
-const installBtn = document.getElementById("installBtn");
-const dismissInstallBtn = document.getElementById("dismissInstallBtn");
-const toast = document.getElementById("toast");
-
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
-}
-
-function closeInstallBanner() {
-  installBanner.classList.remove("show");
-}
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  installBanner.classList.add("show");
-});
-
-window.addEventListener("appinstalled", () => {
-  deferredInstallPrompt = null;
-  closeInstallBanner();
-  showToast("앱이 설치되었습니다.");
-});
-
-installBtn?.addEventListener("click", async () => {
-  if (!deferredInstallPrompt) {
-    showToast("브라우저 메뉴에서 홈 화면에 추가할 수 있어요.");
-    return;
-  }
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice.catch(() => null);
-  deferredInstallPrompt = null;
-  closeInstallBanner();
-});
-
-dismissInstallBtn?.addEventListener("click", closeInstallBanner);
 
 // ── IndexedDB ──────────────────────────────────────────────
 function openDB() {
@@ -509,13 +440,12 @@ let penColor = "#111111";
 let penSize = 5;
 let drawHistory = [];
 let autosaveTimer = null;
-const canvasStage = document.querySelector(".canvas-stage");
 
 function initCanvas(restoreDataUrl) {
   dpr = Math.max(window.devicePixelRatio || 1, 1);
   const rect = canvas.getBoundingClientRect();
   const w = Math.max(1, Math.floor(rect.width * dpr));
-  const cssH = canvas.offsetHeight || 900;
+  const cssH = canvas.offsetHeight || 400;
   const h = Math.max(1, Math.floor(cssH * dpr));
   canvas.width = w;
   canvas.height = h;
@@ -590,7 +520,6 @@ function getCanvasPoint(clientX, clientY) {
 }
 
 function startDraw(x, y) {
-  if (currentTool === "move") return;
   isDrawing = true;
   lastPoint = { x, y };
   applyBrush();
@@ -623,36 +552,56 @@ function scheduleCanvasAutosave() {
   autosaveTimer = setTimeout(() => { snapshotCanvas(); saveDraft(); }, 400);
 }
 
-// Pointer 이벤트 (마우스 + 스타일러스 + 터치 모두 지원)
+// Pointer 이벤트
+// - pen: 실제 스타일러스만 필기
+// - touch: 손가락은 필기하지 않고 스크롤/이동만 허용
+// - mouse: PC 테스트용으로만 허용
+function isAllowedDrawingPointer(e) {
+  return e.pointerType === "pen" || e.pointerType === "mouse";
+}
+
 canvas.addEventListener("pointerdown", e => {
-  if (currentTool === "move") return;
+  if (!isAllowedDrawingPointer(e)) {
+    endDraw();
+    return;
+  }
+
   e.preventDefault();
   const p = getCanvasPoint(e.clientX, e.clientY);
   startDraw(p.x, p.y);
   canvas.setPointerCapture(e.pointerId);
 });
+
 canvas.addEventListener("pointermove", e => {
-  if (currentTool === "move") return;
+  if (!isAllowedDrawingPointer(e)) {
+    endDraw();
+    return;
+  }
+
   e.preventDefault();
   if (!isDrawing) return;
   const p = getCanvasPoint(e.clientX, e.clientY);
   moveDraw(p.x, p.y);
 });
-canvas.addEventListener("pointerup", e => { if (currentTool !== "move") { e.preventDefault(); endDraw(); } });
-canvas.addEventListener("pointercancel", e => { if (currentTool !== "move") { e.preventDefault(); endDraw(); } });
+
+canvas.addEventListener("pointerup", e => {
+  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  endDraw();
+});
+
+canvas.addEventListener("pointercancel", e => {
+  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  endDraw();
+});
 
 // 툴 버튼
 function setTool(tool) {
   currentTool = tool;
   document.getElementById("penToolBtn").classList.toggle("active", tool === "pen");
   document.getElementById("eraserToolBtn").classList.toggle("active", tool === "eraser");
-  document.getElementById("moveToolBtn").classList.toggle("active", tool === "move");
-  canvasStage.style.touchAction = tool === "move" ? "pan-y" : "none";
-  canvasStage.style.cursor = tool === "move" ? "grab" : "crosshair";
 }
 document.getElementById("penToolBtn").addEventListener("click", () => setTool("pen"));
 document.getElementById("eraserToolBtn").addEventListener("click", () => setTool("eraser"));
-document.getElementById("moveToolBtn").addEventListener("click", () => setTool("move"));
 document.getElementById("penSize").addEventListener("input", e => { penSize = Number(e.target.value); });
 
 const colorBtns = [...document.querySelectorAll(".color-btn")];
@@ -684,7 +633,7 @@ const editorOverlay = document.getElementById("editorOverlay");
 function openEditor() {
   editorOverlay.classList.add("open");
   editorOverlay.scrollTop = 0;
-  setTimeout(() => { initCanvas(currentDrawing); setTool("pen"); }, 60);
+  setTimeout(() => initCanvas(currentDrawing), 60);
 }
 
 function closeEditor() {
@@ -762,8 +711,6 @@ async function saveCurrent() {
     resetForm();
     render();
     closeEditor();
-  showToast("복습 완료로 표시했습니다.");
-    showToast(editingId ? "오답이 수정되었습니다." : "오답이 저장되었습니다.");
   } catch (err) {
     alert("저장 중 오류가 발생했습니다. 이미지 수를 줄여보세요.");
     console.error(err);
@@ -815,8 +762,6 @@ function cycleReview(id) {
   notes[idx].reviewStatus = (notes[idx].reviewStatus + 1) % 3;
   saveNotes();
   render();
-  showToast("오답을 삭제했습니다.");
-  showToast("복습 상태를 변경했습니다.");
 }
 
 function removeNote(id) {
@@ -827,7 +772,6 @@ function removeNote(id) {
   if (editingId === id) resetForm();
   saveNotes();
   render();
-  showToast("오답을 복제했습니다.");
 }
 
 function duplicateNote(id) {
@@ -871,7 +815,7 @@ function render() {
   document.getElementById("listMeta").textContent = `${data.length}개 표시 중`;
   const list = document.getElementById("list");
   if (!data.length) {
-    list.innerHTML = `<div class="empty"><strong>첫 오답을 만들어 보세요</strong>틀린 이유와 다시 푼 핵심을 함께 적어두면 복습할 때 훨씬 빨라집니다.<div class="empty-actions"><button class="btn primary" type="button" onclick="startFirstNote()">첫 오답 작성</button><button class="btn" type="button" onclick="addSample()">예시 추가</button></div></div>`;
+    list.innerHTML = `<div class="empty">아직 정리된 오답이 없습니다. 아래 + 버튼을 눌러 첫 오답을 작성하세요.</div>`;
     return;
   }
   list.innerHTML = data.map(note => `
@@ -909,7 +853,6 @@ function exportData() {
   a.download = "wrong_note_backup.json";
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast("백업 파일을 내보냈습니다.");
 }
 
 function importData(file) {
@@ -927,7 +870,6 @@ function importData(file) {
       await saveNotes();
       resetForm();
       render();
-      showToast("백업 파일을 불러왔습니다.");
     } catch { alert("올바른 JSON 파일이 아닙니다."); }
   };
   reader.readAsText(file, "utf-8");
@@ -962,8 +904,6 @@ document.getElementById("importFile").addEventListener("change", e => {
   if (file) importData(file);
   e.target.value = "";
 });
-window.addSample = addSample;
-window.startFirstNote = function () { resetForm(); loadDraft(); openEditor(); };
 document.getElementById("sampleBtn").addEventListener("click", addSample);
 document.getElementById("newBtn").addEventListener("click", () => {
   resetForm();
@@ -999,12 +939,6 @@ window.addEventListener("pagehide", () => { snapshotCanvas(); saveDraft(); });
 window.addEventListener("resize", () => {
   if (editorOverlay.classList.contains("open")) initCanvas(currentDrawing);
 });
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
-}
 
 // ── Init ───────────────────────────────────────────────────
 async function initApp() {
