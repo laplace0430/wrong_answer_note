@@ -6,95 +6,623 @@
 <meta name="theme-color" content="#0b1220" />
 <link rel="manifest" href="manifest.json" />
 <title>오답노트</title>
+
 <style>
 :root{
-  --bg:#0b1220; --panel:#111827; --panel2:#1f2937; --panel3:#0f172a; --line:#334155;
-  --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; --accentSoft:#1e3a8a; --danger:#ef4444;
+  --bg:#0b1220;
+  --panel:#111827;
+  --panel2:#1f2937;
+  --panel3:#0f172a;
+  --line:#334155;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --accent:#3b82f6;
+  --accentSoft:#1e3a8a;
+  --danger:#ef4444;
   --shadow:0 10px 30px rgba(0,0,0,.28);
   --safe-top:max(16px, env(safe-area-inset-top));
   --safe-bottom:max(16px, env(safe-area-inset-bottom));
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif}
-body{min-height:100vh}
-button,input,select,textarea{font:inherit}
-.app{max-width:1500px;margin:0 auto;padding:var(--safe-top) 16px calc(108px + var(--safe-bottom))}
-.top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
-.title{font-size:34px;font-weight:800;letter-spacing:-.03em}
-.sub{color:var(--muted);font-size:15px;margin-top:6px;line-height:1.5}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-weight:700;box-shadow:var(--shadow);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
-.btn.soft{background:var(--accentSoft);color:#bfdbfe;border-color:transparent}
-.btn.danger{background:#3b1111;color:#fecaca;border-color:transparent}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.metric{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
-.metric .n{font-size:30px;font-weight:800}
-.metric .k{font-size:13px;color:var(--muted);margin-top:4px}
-.board{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px;min-height:760px}
-.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.section-title h2{margin:0;font-size:22px}
-.meta{font-size:13px;color:var(--muted)}
-.input,.textarea,.select{width:100%;border:1px solid var(--line);background:var(--panel2);border-radius:16px;padding:16px;color:var(--text);outline:none;font-size:16px}
-.input::placeholder,.textarea::placeholder{color:var(--muted)}
-.textarea{min-height:140px;resize:vertical;line-height:1.65}
-.textarea.large{min-height:220px}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:12px 14px;font-size:14px;font-weight:700;color:#cbd5e1;cursor:pointer}
-.chip.active{background:var(--accentSoft);border-color:transparent;color:#bfdbfe}
-.searchbar{display:grid;grid-template-columns:1fr 220px 160px;gap:10px;margin-bottom:14px}
-.list{display:flex;flex-direction:column;gap:14px}
-.empty{border:1px dashed var(--line);background:var(--panel2);border-radius:20px;padding:32px;text-align:center;color:var(--muted)}
-.card{border:1px solid var(--line);background:var(--panel2);border-radius:22px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.18)}
-.card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
-.badges{display:flex;gap:8px;flex-wrap:wrap}
-.badge{display:inline-flex;align-items:center;height:32px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:800}
-.b-subject{background:#082f49;color:#bae6fd}.b-unit{background:#3b0764;color:#e9d5ff}.b-type{background:#052e16;color:#bbf7d0}
-.b-review0{background:#450a0a;color:#fecaca}.b-review1{background:#451a03;color:#fde68a}.b-review2{background:#052e16;color:#bbf7d0}
-.problem{font-size:24px;font-weight:800;line-height:1.45;margin:14px 0}
-.block{margin-top:12px;padding:16px;background:var(--panel3);border:1px solid var(--line);border-radius:16px}
-.block h3{margin:0 0 8px;font-size:15px}
-.block p{margin:0;white-space:pre-wrap;line-height:1.7;font-size:15px}
-.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.card-actions .btn{min-height:42px;padding:0 13px;border-radius:14px;box-shadow:none}
-.preview-grid,.image-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:10px}
-.preview-item,.image-item{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0f172a}
-.preview-item img,.image-item img{width:100%;height:100%;min-height:140px;object-fit:cover;display:block}
-.remove-image-btn{position:absolute;top:6px;right:6px;min-height:auto;padding:7px 9px;border-radius:10px;font-size:12px;background:rgba(239,68,68,.92);color:white;border:none;cursor:pointer}
-.hint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
-.canvas-wrap{margin-top:10px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;position:relative;z-index:0}
-.canvas-toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:#0f172a;border-bottom:1px solid var(--line);align-items:center;user-select:none;-webkit-user-select:none}
-.tool-btn{min-height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer;touch-action:manipulation}
-.tool-btn.active{background:var(--accent);border-color:transparent;color:white}
-.stroke-range{width:120px;accent-color:#3b82f6}
-.canvas-stage{position:relative;background:#fff;touch-action:pan-y;user-select:none;-webkit-user-select:none;overflow:hidden}
-#drawCanvas{display:block;width:100%;height:520px;background:#fff;touch-action:pan-y;-webkit-user-select:none;user-select:none}
-.color-buttons{display:flex;gap:6px;flex-wrap:wrap}
-.color-btn{min-height:40px;padding:0 13px;border-radius:12px;border:2px solid transparent;color:white;cursor:pointer;font-size:12px;font-weight:700;touch-action:manipulation}
-.color-btn.active{border-color:#fff}
-.color-btn.black{background:#111111}.color-btn.blue{background:#2563eb}.color-btn.red{background:#dc2626}
-.footerbar{position:fixed;left:0;right:0;bottom:0;padding:10px 16px var(--safe-bottom);background:linear-gradient(to top, rgba(11,18,32,.98), rgba(11,18,32,.92), rgba(11,18,32,0));backdrop-filter:blur(10px)}
-.footerinner{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:1fr 78px;gap:10px}
-.quicksearch{min-height:60px;border-radius:18px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:0 18px;outline:none;box-shadow:var(--shadow);font-size:16px}
-.fab{border:0;border-radius:18px;background:var(--accent);color:#fff;font-size:30px;font-weight:900;box-shadow:0 10px 30px rgba(59,130,246,.3);cursor:pointer;touch-action:manipulation}
-.editor-overlay{position:fixed;inset:0;z-index:100;display:none;background:var(--bg);overflow:auto}
-.editor-overlay.open{display:block}
-.editor-shell{padding:var(--safe-top) 18px calc(24px + var(--safe-bottom));max-width:1220px;margin:0 auto}
-.editor-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;position:sticky;top:0;background:linear-gradient(to bottom, rgba(11,18,32,.98) 80%, rgba(11,18,32,0));padding-bottom:10px;z-index:2}
-.editor-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px;position:relative;z-index:1}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:14px;font-weight:700;margin-bottom:8px;color:#cbd5e1}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-actions{position:sticky;bottom:0;z-index:20;background:linear-gradient(to top, rgba(17,24,39,.98) 80%, rgba(17,24,39,0));padding-top:10px}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+.app{
+  max-width:1500px;
+  margin:0 auto;
+  padding:var(--safe-top) 16px calc(108px + var(--safe-bottom));
+}
+
+.top{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.title{
+  font-size:34px;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+
+.sub{
+  color:var(--muted);
+  font-size:15px;
+  margin-top:6px;
+  line-height:1.5;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--text);
+  font-weight:700;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+
+.btn.primary{
+  background:var(--accent);
+  border-color:transparent;
+  color:#fff;
+}
+
+.btn.soft{
+  background:var(--accentSoft);
+  color:#bfdbfe;
+  border-color:transparent;
+}
+
+.btn.danger{
+  background:#3b1111;
+  color:#fecaca;
+  border-color:transparent;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.metric{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.metric .n{
+  font-size:30px;
+  font-weight:800;
+}
+
+.metric .k{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.board{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:20px;
+  min-height:760px;
+}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.section-title h2{
+  margin:0;
+  font-size:22px;
+}
+
+.meta{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.input,.textarea,.select{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  border-radius:16px;
+  padding:16px;
+  color:var(--text);
+  outline:none;
+  font-size:16px;
+}
+
+.input::placeholder,
+.textarea::placeholder{
+  color:var(--muted);
+}
+
+.textarea{
+  min-height:140px;
+  resize:vertical;
+  line-height:1.65;
+}
+
+.textarea.large{
+  min-height:220px;
+}
+
+.chips{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.chip{
+  border:1px solid var(--line);
+  background:var(--panel2);
+  border-radius:999px;
+  padding:12px 14px;
+  font-size:14px;
+  font-weight:700;
+  color:#cbd5e1;
+  cursor:pointer;
+}
+
+.chip.active{
+  background:var(--accentSoft);
+  border-color:transparent;
+  color:#bfdbfe;
+}
+
+.searchbar{
+  display:grid;
+  grid-template-columns:1fr 220px 160px;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.empty{
+  border:1px dashed var(--line);
+  background:var(--panel2);
+  border-radius:20px;
+  padding:32px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.card{
+  border:1px solid var(--line);
+  background:var(--panel2);
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+
+.badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  height:32px;
+  padding:0 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.b-subject{
+  background:#082f49;
+  color:#bae6fd;
+}
+
+.b-unit{
+  background:#3b0764;
+  color:#e9d5ff;
+}
+
+.b-type{
+  background:#052e16;
+  color:#bbf7d0;
+}
+
+.b-review0{
+  background:#450a0a;
+  color:#fecaca;
+}
+
+.b-review1{
+  background:#451a03;
+  color:#fde68a;
+}
+
+.b-review2{
+  background:#052e16;
+  color:#bbf7d0;
+}
+
+.problem{
+  font-size:24px;
+  font-weight:800;
+  line-height:1.45;
+  margin:14px 0;
+}
+
+.block{
+  margin-top:12px;
+  padding:16px;
+  background:var(--panel3);
+  border:1px solid var(--line);
+  border-radius:16px;
+}
+
+.block h3{
+  margin:0 0 8px;
+  font-size:15px;
+}
+
+.block p{
+  margin:0;
+  white-space:pre-wrap;
+  line-height:1.7;
+  font-size:15px;
+}
+
+.card-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.card-actions .btn{
+  min-height:42px;
+  padding:0 13px;
+  border-radius:14px;
+  box-shadow:none;
+}
+
+.preview-grid,
+.image-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+  margin-top:10px;
+}
+
+.preview-item,
+.image-item{
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:#0f172a;
+}
+
+.preview-item img,
+.image-item img{
+  width:100%;
+  height:100%;
+  min-height:140px;
+  object-fit:cover;
+  display:block;
+}
+
+.remove-image-btn{
+  position:absolute;
+  top:6px;
+  right:6px;
+  min-height:auto;
+  padding:7px 9px;
+  border-radius:10px;
+  font-size:12px;
+  background:rgba(239,68,68,.92);
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+.hint{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:6px;
+  line-height:1.5;
+}
+
+.canvas-wrap{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  position:relative;
+  z-index:0;
+}
+
+.canvas-toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:12px;
+  background:#0f172a;
+  border-bottom:1px solid var(--line);
+  align-items:center;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.tool-btn{
+  min-height:40px;
+  padding:0 13px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  font-weight:700;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.tool-btn.active{
+  background:var(--accent);
+  border-color:transparent;
+  color:white;
+}
+
+.stroke-range{
+  width:120px;
+  accent-color:#3b82f6;
+}
+
+/* 중요:
+   Apple Pencil은 pointerType pen으로 필기.
+   손가락은 touch라서 필기 금지 + 세로 스크롤 허용.
+*/
+.canvas-stage{
+  position:relative;
+  background:#fff;
+  user-select:none;
+  -webkit-user-select:none;
+  overflow:hidden;
+  touch-action:pan-y;
+}
+
+#drawCanvas{
+  display:block;
+  width:100%;
+  height:520px;
+  background:#fff;
+  touch-action:pan-y;
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+.color-buttons{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.color-btn{
+  min-height:40px;
+  padding:0 13px;
+  border-radius:12px;
+  border:2px solid transparent;
+  color:white;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+  touch-action:manipulation;
+}
+
+.color-btn.active{
+  border-color:#fff;
+}
+
+.color-btn.black{
+  background:#111111;
+}
+
+.color-btn.blue{
+  background:#2563eb;
+}
+
+.color-btn.red{
+  background:#dc2626;
+}
+
+.footerbar{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:10px 16px var(--safe-bottom);
+  background:linear-gradient(to top, rgba(11,18,32,.98), rgba(11,18,32,.92), rgba(11,18,32,0));
+  backdrop-filter:blur(10px);
+}
+
+.footerinner{
+  max-width:1500px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 78px;
+  gap:10px;
+}
+
+.quicksearch{
+  min-height:60px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  padding:0 18px;
+  outline:none;
+  box-shadow:var(--shadow);
+  font-size:16px;
+}
+
+.fab{
+  border:0;
+  border-radius:18px;
+  background:var(--accent);
+  color:#fff;
+  font-size:30px;
+  font-weight:900;
+  box-shadow:0 10px 30px rgba(59,130,246,.3);
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.editor-overlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  background:var(--bg);
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.editor-overlay.open{
+  display:block;
+}
+
+.editor-shell{
+  padding:var(--safe-top) 18px calc(24px + var(--safe-bottom));
+  max-width:1220px;
+  margin:0 auto;
+}
+
+.editor-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+  position:sticky;
+  top:0;
+  background:linear-gradient(to bottom, rgba(11,18,32,.98) 80%, rgba(11,18,32,0));
+  padding-bottom:10px;
+  z-index:2;
+}
+
+.editor-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:22px;
+  position:relative;
+  z-index:1;
+}
+
+.field{
+  margin-bottom:16px;
+}
+
+.field label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:#cbd5e1;
+}
+
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.form-actions{
+  position:sticky;
+  bottom:0;
+  z-index:20;
+  background:linear-gradient(to top, rgba(17,24,39,.98) 80%, rgba(17,24,39,0));
+  padding-top:10px;
+}
+
 @media (max-width:1100px){
-  .summary{grid-template-columns:repeat(2,1fr)}
-  .searchbar{grid-template-columns:1fr}
-  .editor-shell{padding-left:12px;padding-right:12px}
-  #drawCanvas{height:400px}
-  .row2{grid-template-columns:1fr}
+  .summary{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .searchbar{
+    grid-template-columns:1fr;
+  }
+
+  .editor-shell{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  #drawCanvas{
+    height:430px;
+  }
+
+  .row2{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
@@ -103,6 +631,7 @@ button,input,select,textarea{font:inherit}
       <div class="title">오답노트</div>
       <div class="sub">+ 버튼을 눌러 오답노트를 작성하세요.</div>
     </div>
+
     <div class="actions">
       <button class="btn soft" id="sampleBtn">예시 추가</button>
       <button class="btn" id="exportBtn">내보내기</button>
@@ -112,10 +641,22 @@ button,input,select,textarea{font:inherit}
   </div>
 
   <div class="summary">
-    <div class="metric"><div class="n" id="totalCount">0</div><div class="k">전체 오답</div></div>
-    <div class="metric"><div class="n" id="todayCount">0</div><div class="k">오늘 추가</div></div>
-    <div class="metric"><div class="n" id="needReviewCount">0</div><div class="k">복습 필요</div></div>
-    <div class="metric"><div class="n" id="doneCount">0</div><div class="k">복습 완료</div></div>
+    <div class="metric">
+      <div class="n" id="totalCount">0</div>
+      <div class="k">전체 오답</div>
+    </div>
+    <div class="metric">
+      <div class="n" id="todayCount">0</div>
+      <div class="k">오늘 추가</div>
+    </div>
+    <div class="metric">
+      <div class="n" id="needReviewCount">0</div>
+      <div class="k">복습 필요</div>
+    </div>
+    <div class="metric">
+      <div class="n" id="doneCount">0</div>
+      <div class="k">복습 완료</div>
+    </div>
   </div>
 
   <main class="board">
@@ -123,6 +664,7 @@ button,input,select,textarea{font:inherit}
       <h2>정리된 오답</h2>
       <div class="meta" id="listMeta">0개 표시 중</div>
     </div>
+
     <div class="searchbar">
       <input class="input" id="searchInput" placeholder="문제, 과목, 단원, 이유 검색" />
       <input class="input" id="subjectFilter" placeholder="과목 필터" />
@@ -133,11 +675,11 @@ button,input,select,textarea{font:inherit}
         <option value="복습 완료">복습 완료</option>
       </select>
     </div>
+
     <div class="list" id="list"></div>
   </main>
 </div>
 
-<!-- 에디터 오버레이 -->
 <div class="editor-overlay" id="editorOverlay">
   <div class="editor-shell">
     <div class="editor-header">
@@ -147,41 +689,49 @@ button,input,select,textarea{font:inherit}
         <button class="btn" id="closeEditorBtn">닫기</button>
       </div>
     </div>
+
     <div class="editor-card">
       <div class="row2">
         <div class="field">
           <label>과목</label>
           <input class="input" id="subjectInput" placeholder="예: 수학, 물리학1, 영어" />
         </div>
+
         <div class="field">
           <label>단원</label>
           <input class="input" id="unitInput" placeholder="예: 적분, 역학, 전자기" />
         </div>
       </div>
+
       <div class="row2">
         <div class="field">
           <label>유형</label>
           <input class="input" id="typeInput" placeholder="예: 계산 실수, 개념 미흡" />
         </div>
+
         <div class="field">
           <label>푼 날짜</label>
           <input class="input" id="dateInput" type="date" />
         </div>
       </div>
+
       <div class="field">
         <label>출처</label>
         <input class="input" id="sourceInput" placeholder="예: 3월 모의고사 12번, 수특 45쪽" />
       </div>
+
       <div class="field">
         <label>문제 / 제목</label>
         <textarea class="textarea large" id="problemInput" placeholder="어떤 문제였는지, 무엇을 물었는지 자세히 적기"></textarea>
       </div>
+
       <div class="field">
         <label>문제 이미지</label>
         <input class="input" id="problemImageInput" type="file" accept="image/*" multiple />
         <div class="hint">문제 캡처, 지문 사진 등을 첨부하세요.</div>
         <div class="preview-grid" id="problemImagePreview"></div>
       </div>
+
       <div class="field">
         <label>틀린 이유</label>
         <div class="chips" id="reasonChips">
@@ -192,42 +742,58 @@ button,input,select,textarea{font:inherit}
           <button type="button" class="chip" data-value="암기 부족">암기 부족</button>
         </div>
       </div>
+
       <div class="field">
         <label>세부 원인</label>
         <textarea class="textarea" id="reasonDetailInput" placeholder="왜 틀렸는지, 어떤 생각 때문에 막혔는지 자세히 적기"></textarea>
       </div>
+
       <div class="field">
         <label>정답 / 다시 푼 핵심</label>
         <textarea class="textarea large" id="correctInput" placeholder="다시 풀면서 핵심 논리와 정답을 정리"></textarea>
       </div>
+
       <div class="field">
         <label>풀이 이미지</label>
         <input class="input" id="solutionImageInput" type="file" accept="image/*" multiple />
         <div class="hint">직접 푼 풀이 사진, 필기 캡처 등을 첨부하세요.</div>
         <div class="preview-grid" id="solutionImagePreview"></div>
       </div>
+
       <div class="field">
         <label>풀이 필기</label>
+        <div class="hint">
+          Apple Pencil로만 필기됩니다. 손가락은 필기되지 않고 화면 스크롤에 사용됩니다.
+        </div>
+
         <div class="canvas-wrap">
           <div class="canvas-toolbar">
             <button type="button" class="tool-btn active" id="penToolBtn">펜</button>
             <button type="button" class="tool-btn" id="eraserToolBtn">지우개</button>
+
             <div class="color-buttons">
               <button type="button" class="color-btn black active" data-color="#111111">검정</button>
               <button type="button" class="color-btn blue" data-color="#2563eb">파랑</button>
               <button type="button" class="color-btn red" data-color="#dc2626">빨강</button>
             </div>
+
             <input type="range" id="penSize" class="stroke-range" min="2" max="18" value="5">
+
             <button type="button" class="tool-btn" id="undoBtn">되돌리기</button>
             <button type="button" class="tool-btn" id="clearCanvasBtn">전체 지우기</button>
           </div>
-          <div class="canvas-stage"><canvas id="drawCanvas"></canvas></div>
+
+          <div class="canvas-stage">
+            <canvas id="drawCanvas"></canvas>
+          </div>
         </div>
       </div>
+
       <div class="field">
         <label>다음에 안 틀리기 위한 한 줄</label>
         <textarea class="textarea" id="memoryInput" placeholder="예: 부호 먼저 확인, 그래프 해석 먼저, 조건 문장 두 번 읽기"></textarea>
       </div>
+
       <div class="row2 form-actions">
         <button class="btn primary" id="saveBtn" type="button">저장</button>
         <button class="btn soft" id="reviewBtn" type="button">복습 완료 표시</button>
@@ -236,7 +802,6 @@ button,input,select,textarea{font:inherit}
   </div>
 </div>
 
-<!-- 하단 바 -->
 <div class="footerbar">
   <div class="footerinner">
     <input class="quicksearch" id="quickSearch" placeholder="빠르게 검색" />
@@ -257,15 +822,17 @@ let problemImages = [];
 let solutionImages = [];
 let currentDrawing = null;
 
-// ── IndexedDB ──────────────────────────────────────────────
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
+
     req.onupgradeneeded = () => {
       const db = req.result;
-      if (!db.objectStoreNames.contains(NOTES_STORE))
+      if (!db.objectStoreNames.contains(NOTES_STORE)) {
         db.createObjectStore(NOTES_STORE, { keyPath: "id" });
+      }
     };
+
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
@@ -273,9 +840,11 @@ function openDB() {
 
 async function loadNotes() {
   const db = await openDB();
+
   return new Promise((resolve, reject) => {
     const tx = db.transaction(NOTES_STORE, "readonly");
     const req = tx.objectStore(NOTES_STORE).getAll();
+
     req.onsuccess = () => resolve(Array.isArray(req.result) ? req.result : []);
     req.onerror = () => reject(req.error);
   });
@@ -283,16 +852,35 @@ async function loadNotes() {
 
 async function saveNotes() {
   const db = await openDB();
+
   return new Promise((resolve, reject) => {
     const tx = db.transaction(NOTES_STORE, "readwrite");
     const store = tx.objectStore(NOTES_STORE);
-    store.clear().onsuccess = () => notes.forEach(n => store.put(n));
+
+    const clearReq = store.clear();
+
+    clearReq.onsuccess = () => {
+      notes.forEach(note => store.put(note));
+    };
+
     tx.oncomplete = resolve;
     tx.onerror = () => reject(tx.error);
   });
 }
 
-// ── Draft (localStorage) ───────────────────────────────────
+function esc(t) {
+  return String(t ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function genId() {
+  return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+}
+
 function saveDraft() {
   try {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({
@@ -311,16 +899,19 @@ function saveDraft() {
       solutionImages,
       drawing: currentDrawing
     }));
-  } catch (e) { /* 저장 실패 무시 */ }
+  } catch {}
 }
 
 function loadDraft() {
   try {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return false;
+
     const d = JSON.parse(raw);
     if (!d || typeof d !== "object") return false;
+
     editingId = d.editingId ?? null;
+
     document.getElementById("subjectInput").value = d.subject || "";
     document.getElementById("unitInput").value = d.unit || "";
     document.getElementById("typeInput").value = d.type || "";
@@ -330,66 +921,76 @@ function loadDraft() {
     document.getElementById("reasonDetailInput").value = d.reasonDetail || "";
     document.getElementById("correctInput").value = d.correct || "";
     document.getElementById("memoryInput").value = d.memory || "";
+
     problemImages = Array.isArray(d.problemImages) ? d.problemImages : [];
     solutionImages = Array.isArray(d.solutionImages) ? d.solutionImages : [];
     currentDrawing = d.drawing || null;
+
     syncPreviews();
     setReasonChip(d.reason || "개념 부족");
+
     document.getElementById("formTitle").textContent = editingId ? "오답 수정" : "오답 작성";
+
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 function clearDraft() {
-  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {}
 }
 
-// ── Utils ──────────────────────────────────────────────────
-function esc(t) {
-  return String(t ?? "")
-    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
-}
-
-function genId() {
-  return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
-}
-
-// ── Reason chips ───────────────────────────────────────────
 const reasonChips = [...document.querySelectorAll("#reasonChips .chip")];
-reasonChips.forEach(chip => chip.addEventListener("click", () => {
-  setReasonChip(chip.dataset.value);
-  saveDraft();
-}));
+
+reasonChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    setReasonChip(chip.dataset.value);
+    saveDraft();
+  });
+});
 
 function setReasonChip(value) {
-  reasonChips.forEach(c => c.classList.toggle("active", c.dataset.value === value));
-  if (!reasonChips.some(c => c.classList.contains("active")))
+  reasonChips.forEach(chip => {
+    chip.classList.toggle("active", chip.dataset.value === value);
+  });
+
+  if (!reasonChips.some(chip => chip.classList.contains("active"))) {
     reasonChips[0].classList.add("active");
+  }
 }
 
 function selectedReason() {
-  return (reasonChips.find(c => c.classList.contains("active")) || reasonChips[0]).dataset.value;
+  const active = reasonChips.find(chip => chip.classList.contains("active"));
+  return (active || reasonChips[0]).dataset.value;
 }
 
-// ── Images ─────────────────────────────────────────────────
 function compressImage(file, maxSize = 1600, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+
     reader.onload = () => {
       const img = new Image();
+
       img.onload = () => {
         const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
         const w = Math.max(1, Math.round(img.width * scale));
         const h = Math.max(1, Math.round(img.height * scale));
+
         const c = document.createElement("canvas");
-        c.width = w; c.height = h;
+        c.width = w;
+        c.height = h;
+
         c.getContext("2d").drawImage(img, 0, 0, w, h);
         resolve(c.toDataURL("image/jpeg", quality));
       };
+
       img.onerror = reject;
       img.src = reader.result;
     };
+
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -398,18 +999,22 @@ function compressImage(file, maxSize = 1600, quality = 0.82) {
 async function handleImageInput(input, targetArray) {
   const files = Array.from(input.files || []);
   if (!files.length) return;
-  const loaded = await Promise.all(files.map(f => compressImage(f)));
+
+  const loaded = await Promise.all(files.map(file => compressImage(file)));
   targetArray.push(...loaded);
+
   input.value = "";
   syncPreviews();
   saveDraft();
 }
 
 function renderPreview(container, items, type) {
-  container.innerHTML = items.map((img, idx) =>
-    `<div class="preview-item"><img src="${img}" alt="${type}-${idx}">
-     <button type="button" class="remove-image-btn" onclick="removeImg('${type}',${idx})">삭제</button></div>`
-  ).join("");
+  container.innerHTML = items.map((img, idx) => `
+    <div class="preview-item">
+      <img src="${img}" alt="${type}-${idx}">
+      <button type="button" class="remove-image-btn" onclick="removeImg('${type}', ${idx})">삭제</button>
+    </div>
+  `).join("");
 }
 
 function syncPreviews() {
@@ -417,24 +1022,27 @@ function syncPreviews() {
   renderPreview(document.getElementById("solutionImagePreview"), solutionImages, "solution");
 }
 
-window.removeImg = function (type, idx) {
+window.removeImg = function(type, idx) {
   if (type === "problem") problemImages.splice(idx, 1);
   if (type === "solution") solutionImages.splice(idx, 1);
+
   syncPreviews();
   saveDraft();
 };
 
-document.getElementById("problemImageInput").addEventListener("change", e =>
-  handleImageInput(e.target, problemImages));
-document.getElementById("solutionImageInput").addEventListener("change", e =>
-  handleImageInput(e.target, solutionImages));
+document.getElementById("problemImageInput").addEventListener("change", e => {
+  handleImageInput(e.target, problemImages);
+});
 
-// ── Canvas ─────────────────────────────────────────────────
+document.getElementById("solutionImageInput").addEventListener("change", e => {
+  handleImageInput(e.target, solutionImages);
+});
+
 const canvas = document.getElementById("drawCanvas");
 const ctx = canvas.getContext("2d");
+
 let dpr = Math.max(window.devicePixelRatio || 1, 1);
 let isDrawing = false;
-let lastPoint = null;
 let currentTool = "pen";
 let penColor = "#111111";
 let penSize = 5;
@@ -443,15 +1051,20 @@ let autosaveTimer = null;
 
 function initCanvas(restoreDataUrl) {
   dpr = Math.max(window.devicePixelRatio || 1, 1);
+
   const rect = canvas.getBoundingClientRect();
   const w = Math.max(1, Math.floor(rect.width * dpr));
-  const cssH = canvas.offsetHeight || 400;
+  const cssH = canvas.offsetHeight || 520;
   const h = Math.max(1, Math.floor(cssH * dpr));
+
   canvas.width = w;
   canvas.height = h;
+
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   fillWhite();
   drawHistory = [];
+
   if (restoreDataUrl) {
     loadCanvasImage(restoreDataUrl);
   } else if (currentDrawing) {
@@ -464,6 +1077,7 @@ function initCanvas(restoreDataUrl) {
 function fillWhite() {
   const w = canvas.width / dpr;
   const h = canvas.height / dpr;
+
   ctx.globalCompositeOperation = "source-over";
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, w, h);
@@ -473,30 +1087,46 @@ function snapshotCanvas() {
   try {
     const url = canvas.toDataURL("image/png");
     drawHistory.push(url);
-    if (drawHistory.length > 50) drawHistory.shift();
+
+    if (drawHistory.length > 50) {
+      drawHistory.shift();
+    }
+
     currentDrawing = isCanvasBlank() ? null : url;
   } catch {}
 }
 
 function isCanvasBlank() {
   const blank = document.createElement("canvas");
-  blank.width = canvas.width; blank.height = canvas.height;
+
+  blank.width = canvas.width;
+  blank.height = canvas.height;
+
   const bctx = blank.getContext("2d");
   bctx.fillStyle = "#fff";
   bctx.fillRect(0, 0, blank.width, blank.height);
+
   return canvas.toDataURL() === blank.toDataURL();
 }
 
 function loadCanvasImage(dataUrl) {
-  if (!dataUrl) { snapshotCanvas(); return; }
+  if (!dataUrl) {
+    snapshotCanvas();
+    return;
+  }
+
   const img = new Image();
+
   img.onload = () => {
     fillWhite();
+
     const w = canvas.width / dpr;
     const h = canvas.height / dpr;
+
     ctx.drawImage(img, 0, 0, w, h);
     snapshotCanvas();
   };
+
   img.src = dataUrl;
 }
 
@@ -510,109 +1140,160 @@ function applyBrush() {
     ctx.strokeStyle = penColor;
     ctx.lineWidth = penSize;
   }
+
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 }
 
 function getCanvasPoint(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
-  return { x: clientX - rect.left, y: clientY - rect.top };
+
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
 }
 
 function startDraw(x, y) {
   isDrawing = true;
-  lastPoint = { x, y };
+
   applyBrush();
+
   ctx.beginPath();
   ctx.moveTo(x, y);
 }
 
 function moveDraw(x, y) {
   if (!isDrawing) return;
+
   applyBrush();
+
   ctx.lineTo(x, y);
   ctx.stroke();
+
   ctx.beginPath();
   ctx.moveTo(x, y);
-  lastPoint = { x, y };
+
   scheduleCanvasAutosave();
 }
 
 function endDraw() {
   if (!isDrawing) return;
+
   isDrawing = false;
-  lastPoint = null;
+
   ctx.closePath();
+
   snapshotCanvas();
   saveDraft();
 }
 
 function scheduleCanvasAutosave() {
-  if (autosaveTimer) clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(() => { snapshotCanvas(); saveDraft(); }, 400);
+  if (autosaveTimer) {
+    clearTimeout(autosaveTimer);
+  }
+
+  autosaveTimer = setTimeout(() => {
+    snapshotCanvas();
+    saveDraft();
+  }, 400);
 }
 
-// Pointer 이벤트
-// - pen: 실제 스타일러스만 필기
-// - touch: 손가락은 필기하지 않고 스크롤/이동만 허용
-// - mouse: PC 테스트용으로만 허용
-function isAllowedDrawingPointer(e) {
+/*
+  핵심 부분:
+  Apple Pencil = pointerType "pen" → 필기 가능
+  손가락 = pointerType "touch" → 필기 금지, 스크롤 가능
+  mouse = PC 테스트용
+*/
+function isDrawingPointer(e) {
   return e.pointerType === "pen" || e.pointerType === "mouse";
 }
 
 canvas.addEventListener("pointerdown", e => {
-  if (!isAllowedDrawingPointer(e)) {
+  if (!isDrawingPointer(e)) {
     endDraw();
     return;
   }
 
   e.preventDefault();
+
   const p = getCanvasPoint(e.clientX, e.clientY);
   startDraw(p.x, p.y);
-  canvas.setPointerCapture(e.pointerId);
+
+  try {
+    canvas.setPointerCapture(e.pointerId);
+  } catch {}
 });
 
 canvas.addEventListener("pointermove", e => {
-  if (!isAllowedDrawingPointer(e)) {
+  if (!isDrawingPointer(e)) {
     endDraw();
     return;
   }
 
   e.preventDefault();
+
   if (!isDrawing) return;
+
   const p = getCanvasPoint(e.clientX, e.clientY);
   moveDraw(p.x, p.y);
 });
 
 canvas.addEventListener("pointerup", e => {
-  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  if (isDrawingPointer(e)) {
+    e.preventDefault();
+  }
+
   endDraw();
 });
 
 canvas.addEventListener("pointercancel", e => {
-  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  if (isDrawingPointer(e)) {
+    e.preventDefault();
+  }
+
   endDraw();
 });
 
-// 툴 버튼
 function setTool(tool) {
   currentTool = tool;
+
   document.getElementById("penToolBtn").classList.toggle("active", tool === "pen");
   document.getElementById("eraserToolBtn").classList.toggle("active", tool === "eraser");
 }
-document.getElementById("penToolBtn").addEventListener("click", () => setTool("pen"));
-document.getElementById("eraserToolBtn").addEventListener("click", () => setTool("eraser"));
-document.getElementById("penSize").addEventListener("input", e => { penSize = Number(e.target.value); });
+
+document.getElementById("penToolBtn").addEventListener("click", () => {
+  setTool("pen");
+});
+
+document.getElementById("eraserToolBtn").addEventListener("click", () => {
+  setTool("eraser");
+});
+
+document.getElementById("penSize").addEventListener("input", e => {
+  penSize = Number(e.target.value);
+});
 
 const colorBtns = [...document.querySelectorAll(".color-btn")];
-colorBtns.forEach(btn => btn.addEventListener("click", () => {
-  penColor = btn.dataset.color;
-  colorBtns.forEach(b => b.classList.toggle("active", b === btn));
-  setTool("pen");
-}));
+
+colorBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    penColor = btn.dataset.color;
+
+    colorBtns.forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
+
+    setTool("pen");
+  });
+});
 
 document.getElementById("undoBtn").addEventListener("click", () => {
-  if (drawHistory.length <= 1) { clearCanvas(); return; }
+  if (drawHistory.length <= 1) {
+    clearCanvas();
+    return;
+  }
+
   drawHistory.pop();
   loadCanvasImage(drawHistory[drawHistory.length - 1]);
 });
@@ -627,13 +1308,15 @@ function clearCanvas() {
   saveDraft();
 }
 
-// ── Editor open / close ────────────────────────────────────
 const editorOverlay = document.getElementById("editorOverlay");
 
 function openEditor() {
   editorOverlay.classList.add("open");
   editorOverlay.scrollTop = 0;
-  setTimeout(() => initCanvas(currentDrawing), 60);
+
+  setTimeout(() => {
+    initCanvas(currentDrawing);
+  }, 60);
 }
 
 function closeEditor() {
@@ -642,16 +1325,19 @@ function closeEditor() {
   editorOverlay.classList.remove("open");
 }
 
-// ── Form ───────────────────────────────────────────────────
 document.getElementById("dateInput").value = today;
 
 function getFormData() {
+  snapshotCanvas();
+
   const problem = document.getElementById("problemInput").value.trim();
+
   if (!problem) {
     alert("문제 / 제목을 입력하세요.");
     document.getElementById("problemInput").focus();
     return null;
   }
+
   return {
     id: editingId || genId(),
     subject: document.getElementById("subjectInput").value.trim(),
@@ -674,15 +1360,31 @@ function getFormData() {
 
 function resetForm() {
   editingId = null;
+
   document.getElementById("formTitle").textContent = "오답 작성";
-  ["subjectInput","unitInput","typeInput","sourceInput","problemInput",
-   "reasonDetailInput","correctInput","memoryInput"].forEach(id => {
+
+  [
+    "subjectInput",
+    "unitInput",
+    "typeInput",
+    "sourceInput",
+    "problemInput",
+    "reasonDetailInput",
+    "correctInput",
+    "memoryInput"
+  ].forEach(id => {
     document.getElementById(id).value = "";
   });
+
   document.getElementById("dateInput").value = today;
-  problemImages = []; solutionImages = []; currentDrawing = null;
+
+  problemImages = [];
+  solutionImages = [];
+  currentDrawing = null;
+
   document.getElementById("problemImageInput").value = "";
   document.getElementById("solutionImageInput").value = "";
+
   syncPreviews();
   setReasonChip("개념 부족");
   clearCanvas();
@@ -692,12 +1394,15 @@ function resetForm() {
 async function saveCurrent() {
   const saveBtn = document.getElementById("saveBtn");
   saveBtn.disabled = true;
+
   try {
-    snapshotCanvas();
     const data = getFormData();
+
     if (!data) return;
+
     if (editingId) {
-      const idx = notes.findIndex(n => n.id === editingId);
+      const idx = notes.findIndex(note => note.id === editingId);
+
       if (idx !== -1) {
         data.reviewStatus = notes[idx].reviewStatus;
         data.createdAt = notes[idx].createdAt;
@@ -706,7 +1411,9 @@ async function saveCurrent() {
     } else {
       notes.unshift(data);
     }
+
     await saveNotes();
+
     clearDraft();
     resetForm();
     render();
@@ -720,10 +1427,17 @@ async function saveCurrent() {
 }
 
 async function markReviewDone() {
-  if (!editingId) { alert("목록에서 수정할 오답을 먼저 선택하세요."); return; }
-  const idx = notes.findIndex(n => n.id === editingId);
+  if (!editingId) {
+    alert("목록에서 수정할 오답을 먼저 선택하세요.");
+    return;
+  }
+
+  const idx = notes.findIndex(note => note.id === editingId);
+
   if (idx === -1) return;
+
   notes[idx].reviewStatus = 2;
+
   await saveNotes();
   clearDraft();
   render();
@@ -731,9 +1445,12 @@ async function markReviewDone() {
 }
 
 function openEdit(id) {
-  const note = notes.find(n => n.id === id);
+  const note = notes.find(note => note.id === id);
+
   if (!note) return;
+
   editingId = note.id;
+
   document.getElementById("formTitle").textContent = "오답 수정";
   document.getElementById("subjectInput").value = note.subject || "";
   document.getElementById("unitInput").value = note.unit || "";
@@ -744,41 +1461,66 @@ function openEdit(id) {
   document.getElementById("reasonDetailInput").value = note.reasonDetail || "";
   document.getElementById("correctInput").value = note.correct || "";
   document.getElementById("memoryInput").value = note.memory || "";
+
   problemImages = Array.isArray(note.problemImages) ? [...note.problemImages] : [];
   solutionImages = Array.isArray(note.solutionImages) ? [...note.solutionImages] : [];
   currentDrawing = note.drawing || null;
+
   syncPreviews();
   setReasonChip(note.reason || "개념 부족");
   openEditor();
 }
 
-// ── Review / Delete / Duplicate ────────────────────────────
-function reviewLabel(s) { return s === 2 ? "복습 완료" : s === 1 ? "복습 중" : "복습 필요"; }
-function reviewBadgeClass(s) { return s === 2 ? "b-review2" : s === 1 ? "b-review1" : "b-review0"; }
+function reviewLabel(s) {
+  return s === 2 ? "복습 완료" : s === 1 ? "복습 중" : "복습 필요";
+}
 
-function cycleReview(id) {
-  const idx = notes.findIndex(n => n.id === id);
+function reviewBadgeClass(s) {
+  return s === 2 ? "b-review2" : s === 1 ? "b-review1" : "b-review0";
+}
+
+async function cycleReview(id) {
+  const idx = notes.findIndex(note => note.id === id);
+
   if (idx === -1) return;
+
   notes[idx].reviewStatus = (notes[idx].reviewStatus + 1) % 3;
-  saveNotes();
+
+  await saveNotes();
   render();
 }
 
-function removeNote(id) {
-  const note = notes.find(n => n.id === id);
+async function removeNote(id) {
+  const note = notes.find(note => note.id === id);
+
   if (!note) return;
+
   if (!confirm(`'${note.problem.slice(0, 20)}' 삭제할까요?`)) return;
-  notes = notes.filter(n => n.id !== id);
-  if (editingId === id) resetForm();
-  saveNotes();
+
+  notes = notes.filter(note => note.id !== id);
+
+  if (editingId === id) {
+    resetForm();
+  }
+
+  await saveNotes();
   render();
 }
 
-function duplicateNote(id) {
-  const note = notes.find(n => n.id === id);
+async function duplicateNote(id) {
+  const note = notes.find(note => note.id === id);
+
   if (!note) return;
-  notes.unshift({ ...note, id: genId(), problem: note.problem + " (복사본)", reviewStatus: 0, createdAt: Date.now() });
-  saveNotes();
+
+  notes.unshift({
+    ...note,
+    id: genId(),
+    problem: note.problem + " (복사본)",
+    reviewStatus: 0,
+    createdAt: Date.now()
+  });
+
+  await saveNotes();
   render();
 }
 
@@ -787,37 +1529,57 @@ window.cycleReview = cycleReview;
 window.removeNote = removeNote;
 window.duplicateNote = duplicateNote;
 
-// ── Filter & Render ────────────────────────────────────────
 function filteredNotes() {
   const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
   const subjectFilter = document.getElementById("subjectFilter").value.trim().toLowerCase();
   const reviewFilter = document.getElementById("reviewFilter").value;
+
   return [...notes]
-    .filter(n => {
-      const text = [n.problem, n.subject, n.unit, n.reason, n.reasonDetail, n.correct, n.memory, n.source, n.type].join(" ").toLowerCase();
+    .filter(note => {
+      const text = [
+        note.problem,
+        note.subject,
+        note.unit,
+        note.reason,
+        note.reasonDetail,
+        note.correct,
+        note.memory,
+        note.source,
+        note.type
+      ].join(" ").toLowerCase();
+
       return (!keyword || text.includes(keyword))
-        && (!subjectFilter || (n.subject || "").toLowerCase().includes(subjectFilter))
-        && (reviewFilter === "전체" || reviewLabel(n.reviewStatus) === reviewFilter);
+        && (!subjectFilter || (note.subject || "").toLowerCase().includes(subjectFilter))
+        && (reviewFilter === "전체" || reviewLabel(note.reviewStatus) === reviewFilter);
     })
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
 
 function renderSummary() {
   document.getElementById("totalCount").textContent = notes.length;
-  document.getElementById("todayCount").textContent = notes.filter(n => n.date === today).length;
-  document.getElementById("needReviewCount").textContent = notes.filter(n => n.reviewStatus !== 2).length;
-  document.getElementById("doneCount").textContent = notes.filter(n => n.reviewStatus === 2).length;
+  document.getElementById("todayCount").textContent = notes.filter(note => note.date === today).length;
+  document.getElementById("needReviewCount").textContent = notes.filter(note => note.reviewStatus !== 2).length;
+  document.getElementById("doneCount").textContent = notes.filter(note => note.reviewStatus === 2).length;
 }
 
 function render() {
   renderSummary();
+
   const data = filteredNotes();
-  document.getElementById("listMeta").textContent = `${data.length}개 표시 중`;
   const list = document.getElementById("list");
+
+  document.getElementById("listMeta").textContent = `${data.length}개 표시 중`;
+
   if (!data.length) {
-    list.innerHTML = `<div class="empty">아직 정리된 오답이 없습니다. 아래 + 버튼을 눌러 첫 오답을 작성하세요.</div>`;
+    list.innerHTML = `
+      <div class="empty">
+        아직 정리된 오답이 없습니다.<br>
+        아래 + 버튼을 눌러 첫 오답을 작성하세요.
+      </div>
+    `;
     return;
   }
+
   list.innerHTML = data.map(note => `
     <div class="card">
       <div class="card-top">
@@ -827,124 +1589,227 @@ function render() {
           ${note.type ? `<span class="badge b-type">${esc(note.type)}</span>` : ""}
           <span class="badge ${reviewBadgeClass(note.reviewStatus)}">${reviewLabel(note.reviewStatus)}</span>
         </div>
-        <div class="meta">${esc(note.date || "")}${note.source ? " · " + esc(note.source) : ""}</div>
+
+        <div class="meta">
+          ${esc(note.date || "")}${note.source ? " · " + esc(note.source) : ""}
+        </div>
       </div>
+
       <div class="problem">${esc(note.problem)}</div>
-      ${note.problemImages?.length ? `<div class="block"><h3>문제 이미지</h3><div class="image-grid">${note.problemImages.map(img => `<div class="image-item"><img src="${img}" alt=""></div>`).join("")}</div></div>` : ""}
-      <div class="block"><h3>틀린 이유</h3><p><strong>${esc(note.reason || "")}</strong>${note.reasonDetail ? "\n" + esc(note.reasonDetail) : ""}</p></div>
-      <div class="block"><h3>다시 푼 핵심</h3><p>${esc(note.correct || "아직 정리 안 함")}</p></div>
-      ${note.solutionImages?.length ? `<div class="block"><h3>풀이 이미지</h3><div class="image-grid">${note.solutionImages.map(img => `<div class="image-item"><img src="${img}" alt=""></div>`).join("")}</div></div>` : ""}
-      ${note.drawing ? `<div class="block"><h3>풀이 필기</h3><div style="border-radius:12px;overflow:hidden;background:#fff"><img src="${note.drawing}" style="width:100%;display:block" alt=""></div></div>` : ""}
-      <div class="block"><h3>다음에 안 틀리기 위한 한 줄</h3><p>${esc(note.memory || "아직 정리 안 함")}</p></div>
+
+      ${note.problemImages?.length ? `
+        <div class="block">
+          <h3>문제 이미지</h3>
+          <div class="image-grid">
+            ${note.problemImages.map(img => `
+              <div class="image-item"><img src="${img}" alt=""></div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      <div class="block">
+        <h3>틀린 이유</h3>
+        <p><strong>${esc(note.reason || "")}</strong>${note.reasonDetail ? "\n" + esc(note.reasonDetail) : ""}</p>
+      </div>
+
+      <div class="block">
+        <h3>다시 푼 핵심</h3>
+        <p>${esc(note.correct || "아직 정리 안 함")}</p>
+      </div>
+
+      ${note.solutionImages?.length ? `
+        <div class="block">
+          <h3>풀이 이미지</h3>
+          <div class="image-grid">
+            ${note.solutionImages.map(img => `
+              <div class="image-item"><img src="${img}" alt=""></div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      ${note.drawing ? `
+        <div class="block">
+          <h3>풀이 필기</h3>
+          <div style="border-radius:12px;overflow:hidden;background:#fff">
+            <img src="${note.drawing}" style="width:100%;display:block" alt="">
+          </div>
+        </div>
+      ` : ""}
+
+      <div class="block">
+        <h3>다음에 안 틀리기 위한 한 줄</h3>
+        <p>${esc(note.memory || "아직 정리 안 함")}</p>
+      </div>
+
       <div class="card-actions">
         <button class="btn" onclick="openEdit('${note.id}')">수정</button>
         <button class="btn soft" onclick="cycleReview('${note.id}')">복습 상태 변경</button>
         <button class="btn" onclick="duplicateNote('${note.id}')">복제</button>
         <button class="btn danger" onclick="removeNote('${note.id}')">삭제</button>
       </div>
-    </div>`).join("");
+    </div>
+  `).join("");
 }
 
-// ── Export / Import ────────────────────────────────────────
 function exportData() {
-  const blob = new Blob([JSON.stringify(notes, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(notes, null, 2)], {
+    type: "application/json"
+  });
+
   const a = document.createElement("a");
+
   a.href = URL.createObjectURL(blob);
   a.download = "wrong_note_backup.json";
   a.click();
+
   URL.revokeObjectURL(a.href);
 }
 
 function importData(file) {
   const reader = new FileReader();
+
   reader.onload = async () => {
     try {
       const parsed = JSON.parse(reader.result);
-      if (!Array.isArray(parsed)) throw new Error();
-      notes = parsed.map(n => ({
-        ...n,
-        problemImages: Array.isArray(n.problemImages) ? n.problemImages : [],
-        solutionImages: Array.isArray(n.solutionImages) ? n.solutionImages : [],
-        drawing: n.drawing || null
+
+      if (!Array.isArray(parsed)) {
+        throw new Error();
+      }
+
+      notes = parsed.map(note => ({
+        ...note,
+        problemImages: Array.isArray(note.problemImages) ? note.problemImages : [],
+        solutionImages: Array.isArray(note.solutionImages) ? note.solutionImages : [],
+        drawing: note.drawing || null
       }));
+
       await saveNotes();
       resetForm();
       render();
-    } catch { alert("올바른 JSON 파일이 아닙니다."); }
+    } catch {
+      alert("올바른 JSON 파일이 아닙니다.");
+    }
   };
+
   reader.readAsText(file, "utf-8");
 }
 
 async function addSample() {
-  if (notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까요?")) return;
+  if (notes.length > 0 && !confirm("이미 데이터가 있는데 예시를 추가할까요?")) {
+    return;
+  }
+
   notes.unshift({
-    id: genId(), subject: "수학", unit: "적분", type: "계산 실수",
-    date: today, source: "기출 21번",
+    id: genId(),
+    subject: "수학",
+    unit: "적분",
+    type: "계산 실수",
+    date: today,
+    source: "기출 21번",
     problem: "부분적분을 두 번 써야 하는 문제였는데 첫 단계에서 부호를 잘못 처리함.",
-    problemImages: [], reason: "계산 실수",
+    problemImages: [],
+    reason: "계산 실수",
     reasonDetail: "미분되는 항과 적분되는 항을 바꿔 적었고 마지막 부호 확인을 안 함.",
     correct: "u=x, dv=eˣdx로 놓고 부분적분 후 다시 한 번 적용. 마지막에 상수항 정리까지 확인.",
-    solutionImages: [], drawing: null,
+    solutionImages: [],
+    drawing: null,
     memory: "부분적분 문제는 식 변형 끝난 뒤 부호를 한 번 더 체크.",
-    reviewStatus: 1, createdAt: Date.now()
+    reviewStatus: 1,
+    createdAt: Date.now()
   });
+
   await saveNotes();
   render();
 }
 
-// ── Event bindings ─────────────────────────────────────────
 document.getElementById("saveBtn").addEventListener("click", saveCurrent);
 document.getElementById("reviewBtn").addEventListener("click", markReviewDone);
 document.getElementById("resetFormBtn").addEventListener("click", resetForm);
 document.getElementById("closeEditorBtn").addEventListener("click", closeEditor);
 document.getElementById("exportBtn").addEventListener("click", exportData);
-document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+
+document.getElementById("importBtn").addEventListener("click", () => {
+  document.getElementById("importFile").click();
+});
+
 document.getElementById("importFile").addEventListener("change", e => {
   const file = e.target.files?.[0];
-  if (file) importData(file);
+
+  if (file) {
+    importData(file);
+  }
+
   e.target.value = "";
 });
+
 document.getElementById("sampleBtn").addEventListener("click", addSample);
+
 document.getElementById("newBtn").addEventListener("click", () => {
   resetForm();
   loadDraft();
   openEditor();
 });
 
-// 검색 — quickSearch ↔ searchInput 단방향 동기화 (루프 방지)
 document.getElementById("searchInput").addEventListener("input", e => {
   document.getElementById("quickSearch").value = e.target.value;
   render();
 });
+
 document.getElementById("quickSearch").addEventListener("input", e => {
   document.getElementById("searchInput").value = e.target.value;
   render();
 });
+
 document.getElementById("subjectFilter").addEventListener("input", render);
 document.getElementById("reviewFilter").addEventListener("change", render);
 
-// 텍스트 입력 자동 초안 저장
-["subjectInput","unitInput","typeInput","dateInput","sourceInput",
- "problemInput","reasonDetailInput","correctInput","memoryInput"].forEach(id => {
+[
+  "subjectInput",
+  "unitInput",
+  "typeInput",
+  "dateInput",
+  "sourceInput",
+  "problemInput",
+  "reasonDetailInput",
+  "correctInput",
+  "memoryInput"
+].forEach(id => {
   document.getElementById(id).addEventListener("input", saveDraft);
 });
 
-// 앱 숨김 / 종료 시 초안 저장
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") { snapshotCanvas(); saveDraft(); }
+  if (document.visibilityState === "hidden") {
+    snapshotCanvas();
+    saveDraft();
+  }
 });
-window.addEventListener("pagehide", () => { snapshotCanvas(); saveDraft(); });
 
-// 화면 회전 / 리사이즈 시 캔버스 재초기화
+window.addEventListener("pagehide", () => {
+  snapshotCanvas();
+  saveDraft();
+});
+
 window.addEventListener("resize", () => {
-  if (editorOverlay.classList.contains("open")) initCanvas(currentDrawing);
+  if (editorOverlay.classList.contains("open")) {
+    initCanvas(currentDrawing);
+  }
 });
 
-// ── Init ───────────────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => {
+      console.warn("Service worker registration failed:", err);
+    });
+  });
+}
+
 async function initApp() {
   notes = await loadNotes();
   render();
 }
+
 initApp();
 </script>
 </body>
