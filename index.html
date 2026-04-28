@@ -4,6 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b1220" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="오답노트" />
+<link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.json" />
 <title>오답노트</title>
 <style>
@@ -208,6 +212,7 @@ button,input,select,textarea{font:inherit}
       </div>
       <div class="field">
         <label>풀이 필기</label>
+        <div class="hint">펜 입력만 필기됩니다. 손가락 터치는 필기되지 않습니다.</div>
         <div class="canvas-wrap">
           <div class="canvas-toolbar">
             <button type="button" class="tool-btn active" id="penToolBtn">펜</button>
@@ -552,21 +557,47 @@ function scheduleCanvasAutosave() {
   autosaveTimer = setTimeout(() => { snapshotCanvas(); saveDraft(); }, 400);
 }
 
-// Pointer 이벤트 (마우스 + 스타일러스 + 터치 모두 지원)
+// Pointer 이벤트
+// - pen: 실제 스타일러스만 필기
+// - touch: 손가락은 필기하지 않고 스크롤/이동만 허용
+// - mouse: PC 테스트용으로만 허용
+function isAllowedDrawingPointer(e) {
+  return e.pointerType === "pen";
+}
+
 canvas.addEventListener("pointerdown", e => {
+  if (!isAllowedDrawingPointer(e)) {
+    endDraw();
+    return;
+  }
+
   e.preventDefault();
   const p = getCanvasPoint(e.clientX, e.clientY);
   startDraw(p.x, p.y);
-  canvas.setPointerCapture(e.pointerId);
+  try { canvas.setPointerCapture(e.pointerId); } catch {}
 });
+
 canvas.addEventListener("pointermove", e => {
+  if (!isAllowedDrawingPointer(e)) {
+    endDraw();
+    return;
+  }
+
   e.preventDefault();
   if (!isDrawing) return;
   const p = getCanvasPoint(e.clientX, e.clientY);
   moveDraw(p.x, p.y);
 });
-canvas.addEventListener("pointerup", e => { e.preventDefault(); endDraw(); });
-canvas.addEventListener("pointercancel", e => { e.preventDefault(); endDraw(); });
+
+canvas.addEventListener("pointerup", e => {
+  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  endDraw();
+});
+
+canvas.addEventListener("pointercancel", e => {
+  if (isAllowedDrawingPointer(e)) e.preventDefault();
+  endDraw();
+});
 
 // 툴 버튼
 function setTool(tool) {
@@ -915,6 +946,15 @@ window.addEventListener("resize", () => {
 });
 
 // ── Init ───────────────────────────────────────────────────
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => {
+      console.warn("Service worker registration failed:", err);
+    });
+  });
+}
+
 async function initApp() {
   notes = await loadNotes();
   render();
@@ -923,4 +963,3 @@ initApp();
 </script>
 </body>
 </html>
-  
